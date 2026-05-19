@@ -1,6 +1,7 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date
 from typing import Optional
+
 
 @dataclass
 class Workout:
@@ -10,14 +11,14 @@ class Workout:
     duration_minutes: int
     calories_burned: Optional[int] = None
     notes: Optional[str] = None
-    id: Optional[str] = None
 
     def __post_init__(self) -> None:
         if self.duration_minutes <= 0:
-            raise ValueError("Duration must be a non-negative integer.")
+            raise ValueError("Duration must be a positive integer.")
+
         if self.calories_burned is not None and self.calories_burned < 0:
             raise ValueError("Calories burned must be a non-negative integer.")
-            
+
 
 @dataclass
 class Nutrition:
@@ -27,7 +28,6 @@ class Nutrition:
     carbs: Optional[int] = None
     protein: Optional[int] = None
     fat: Optional[int] = None
-    id: Optional[str] = None
 
     def __post_init__(self) -> None:
         if self.calories < 0:
@@ -39,16 +39,17 @@ class Nutrition:
         if self.fat is not None and self.fat < 0:
             raise ValueError("Fat must be a non-negative integer.")
 
+
 @dataclass
 class Weight:
     date: date
     weight_kg: float
-    id: Optional[str] = None
 
     def __post_init__(self) -> None:
         if self.weight_kg <= 0:
             raise ValueError("Weight must be a positive number.")
-        
+
+
 @dataclass
 class Goal:
     goal_type: str
