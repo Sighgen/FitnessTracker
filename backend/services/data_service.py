@@ -55,3 +55,22 @@ def _load_csv(filepath: Path, cols: list[str]) -> pd.DataFrame:
         return pd.DataFrame(columns=cols)
     return df
 
+#####################################################
+# Workout functions                                 #
+#####################################################
+
+def save_workout(entry: WorkoutEntry) -> WorkoutEntry:
+    """Save a workout entry . retunrn generated id."""
+    df = _load_csv(WORKOUTS_FILE, WORKOUTS_COlS)
+    entry.id = _generate_id()
+    new_row = pd.DataFrame([{
+        "id": entry.id,
+        "date": entry.date.isoformat(),
+        "type": entry.type,
+        "duration_minutes": entry.duration_minutes,
+        "calories_burned": entry.calories_burned,
+        "notes": entry.notes,
+    }])
+    df = pd.concat([df, new_row], ignore_index=True)
+    df.to_csv(WORKOUTS_FILE, index=False)
+    return entry
