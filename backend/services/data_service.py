@@ -212,3 +212,10 @@ def delete_nutrition(nutrition_id: str) -> bool:
     df.to_csv(NUTRITION_FILE, index=False)
 
     return True
+
+def get_daily_calories(target_date: date) -> int:
+    """Calculate total calories consumed on a specific date."""
+    df = get_nutrition(from_date=target_date, to_date=target_date)
+    if df.empty:
+        return 0
+    return int(df["calories"].sum())
