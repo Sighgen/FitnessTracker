@@ -41,3 +41,17 @@ def ensure_data_directory() -> None:
         if not file.exists():
             pd.DataFrame(columns=cols).to_csv(file, index=False)
     
+
+def _generate_id() -> str:
+    """Generate a unique ID for workouts and goals."""
+    return str(uuid.uuid4())
+
+
+def _load_csv(filepath: Path, cols: list[str]) -> pd.DataFrame:
+    """Load CSV files into a DataFrame, ensuring the correct columns, if the file is empty."""
+    _ensure_data_dir()
+    df = pd.read_csv(filepath)
+    if df.empty:
+        return pd.DataFrame(columns=cols)
+    return df
+
