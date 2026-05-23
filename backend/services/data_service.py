@@ -10,8 +10,8 @@ from datetime import date
 from pathlib import Path
 from typing import Optional
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from models import Nutrition, Weight, Workout
 
@@ -35,6 +35,7 @@ WORKOUTS_SCHEMA = [
 ]
 
 NUTRITION_SCHEMA = [
+    "id",
     "date",
     "meal_name",
     "calories",
@@ -43,7 +44,11 @@ NUTRITION_SCHEMA = [
     "fat",
 ]
 
-WEIGHT_SCHEMA = ["date", "weight_kg"]
+WEIGHT_SCHEMA = [
+    "id",
+    "date",
+    "weight_kg",
+]
 
 GOALS_SCHEMA = [
     "id",
@@ -85,9 +90,11 @@ def _load_csv(filepath: Path, cols: list[str]) -> pd.DataFrame:
 
     return df
 
+
 ######################################################
 # Helper functions                                   #
 ######################################################
+
 
 def _filter_by_date(
     df: pd.DataFrame,
@@ -109,9 +116,9 @@ def _filter_by_date(
     return df.sort_values("date", ascending=False).reset_index(drop=True)
 
 
-#####################################################
-# Workout functions
-#####################################################
+######################################################
+# Workout functions                                  #
+######################################################
 
 
 def save_workout(entry: Workout) -> Workout:
@@ -165,14 +172,18 @@ def delete_workout(workout_id: str) -> bool:
 
     return True
 
+
 ######################################################
 # Nutrition functions                                #
 ######################################################
 
+
 def save_nutrition(entry: Nutrition) -> Nutrition:
     """Save nutrition entry and return it with generated ID."""
     df = _load_csv(NUTRITION_FILE, NUTRITION_SCHEMA)
+
     entry.id = _generate_id()
+
     new_row = pd.DataFrame(
         [
             {
@@ -186,9 +197,13 @@ def save_nutrition(entry: Nutrition) -> Nutrition:
             }
         ]
     )
+
     df = pd.concat([df, new_row], ignore_index=True)
+
     df.to_csv(NUTRITION_FILE, index=False)
+
     return entry
+
 
 def get_nutrition(
     from_date: Optional[date] = None,
@@ -198,6 +213,7 @@ def get_nutrition(
     df = _load_csv(NUTRITION_FILE, NUTRITION_SCHEMA)
 
     return _filter_by_date(df, from_date, to_date)
+
 
 def delete_nutrition(nutrition_id: str) -> bool:
     """Delete a nutrition entry by ID."""
@@ -214,23 +230,28 @@ def delete_nutrition(nutrition_id: str) -> bool:
 
     return True
 
+
 def get_daily_calories(target_date: date) -> int:
     """Calculate total calories consumed on a specific date."""
     df = get_nutrition(from_date=target_date, to_date=target_date)
+
     if df.empty:
         return 0
+
     return int(df["calories"].sum())
 
 
-########################################################
-# Weight functions                                     #
-########################################################
+######################################################
+# Weight functions                                   #
+######################################################
+
 
 def save_weight(entry: Weight) -> Weight:
     """Save weight entry."""
     df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
 
     entry.id = _generate_id()
+
     new_row = pd.DataFrame(
         [
             {
@@ -240,9 +261,13 @@ def save_weight(entry: Weight) -> Weight:
             }
         ]
     )
+
     df = pd.concat([df, new_row], ignore_index=True)
+
     df.to_csv(WEIGHT_FILE, index=False)
+
     return entry
+
 
 def get_weight(
     from_date: Optional[date] = None,
@@ -252,6 +277,7 @@ def get_weight(
     df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
 
     return _filter_by_date(df, from_date, to_date)
+
 
 def delete_weight(weight_id: str) -> bool:
     """Delete a weight entry by ID."""
@@ -268,6 +294,7 @@ def delete_weight(weight_id: str) -> bool:
 
     return True
 
+
 def get_weight_trend(
     from_date: Optional[date] = None,
     to_date: Optional[date] = None,
@@ -275,6 +302,114 @@ def get_weight_trend(
     """Get weight trend filtered by optional date range."""
     df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
 
-    return _filter_by_date(df, from_date, to_date).sort_values(
-        "date"
-    ).reset_index(drop=True)
+    return (
+        _filter_by_date(df, from_date, to_date)
+        .sort_values("date")
+        .reset_index(drop=True)
+    )
+
+
+######################################################
+# Stats functions                                    #
+######################################################
+
+
+def get_workout_stats(days: int = 30) -> dict:
+    """
+    Calculate workout stats for the past N days.
+
+    Return dict with key numbers.
+    """
+    from_date = pd.Timestamp.now().date() - pd.Timedelta(days=days)
+
+    df = get_workouts(from_date=from_date)
+
+    if df.empty:
+        return {
+            "total_workouts": 0,
+            "total_duration": 0,
+            "total_calories": 0,
+            "average_duration": 0,
+            "average_calories": 0,
+        }
+
+    duration = df["duration_minutes"].astype(float).values
+    calories = df["calories_burned"].dropna().astype(float).values
+
+    return {
+        "total_workouts": len(df),
+        "total_duration": int(duration.sum()),
+        "total_calories": int(calories.sum()),
+        "average_duration": int(duration.mean()),
+        "average_calories": int(calories.mean()) if len(calories) > 0 else 0,
+    }
+
+
+def get_nutrition_stats(days: int = 30) -> dict:
+    """
+    Calculate nutrition stats for the past N days.
+
+    Return dict with key numbers.
+    """
+    from_date = pd.Timestamp.now().date() - pd.Timedelta(days=days)
+
+    df = get_nutrition(from_date=from_date)
+
+    if df.empty:
+        return {
+            "total_meals": 0,
+            "total_calories": 0,
+            "average_calories": 0,
+            "average_carbs": 0,
+            "average_protein": 0,
+            "average_fat": 0,
+        }
+
+    calories = df["calories"].dropna().astype(float).values
+    carbs = df["carbs"].dropna().astype(float).values
+    protein = df["protein"].dropna().astype(float).values
+    fat = df["fat"].dropna().astype(float).values
+
+    return {
+        "total_meals": len(df),
+        "total_calories": int(calories.sum()),
+        "average_calories": int(calories.mean()) if len(calories) > 0 else 0,
+        "average_carbs": int(carbs.mean()) if len(carbs) > 0 else 0,
+        "average_protein": int(protein.mean()) if len(protein) > 0 else 0,
+        "average_fat": int(fat.mean()) if len(fat) > 0 else 0,
+    }
+
+
+def get_weight_stats(days: int = 30) -> dict:
+    """Calculate weight statistics."""
+    from_date = pd.Timestamp.now().date() - pd.Timedelta(days=days)
+
+    df = get_weight_trend(from_date=from_date)
+
+    if df.empty or len(df) < 2:
+        current = float(df["weight_kg"].iloc[-1]) if not df.empty else None
+
+        return {
+            "current_weight": current,
+            "start_weight": current,
+            "change": 0.0,
+            "trend": "not enough data",
+        }
+
+    weights = df["weight_kg"].dropna().astype(float).values
+
+    change = round(float(weights[-1]) - float(weights[0]), 1)
+
+    # Simple trend analysis with NumPy polyfit
+    x = np.arange(len(weights))
+
+    slope, _ = np.polyfit(x, weights, 1)
+
+    trend = "down" if slope < -0.05 else "up" if slope > 0.05 else "stable"
+
+    return {
+        "current_weight": round(float(weights[-1]), 1),
+        "start_weight": round(float(weights[0]), 1),
+        "change": change,
+        "trend": trend,
+    }
