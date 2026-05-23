@@ -89,3 +89,15 @@ def get_workouts(
     if to_date:
         df = df[df["date"] <= to_date]
     return df.sort_values("date", ascending=False).reset_index(drop=True)
+
+
+def delete_workout(workout_id: str) -> bool:
+    """Delete a workout. Returns True if deleted."""
+    df = _load_csv(WORKOUTS_FILE, WORKOUTS_COLS)
+    original_len = len(df)
+    df = df[df["id"] != workout_id]
+    if len(df) == original_len:
+        return False  # No workout found with the given ID
+    df.to_csv(WORKOUTS_FILE, index=False)
+    return True
+
