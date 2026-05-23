@@ -38,3 +38,5 @@ jobs:
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+          # Only validate files that were changed in the pull request. Omit to validate all files.
+          VALIDATE_ALL_CODEBASE: false
