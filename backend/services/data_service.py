@@ -220,3 +220,26 @@ def get_daily_calories(target_date: date) -> int:
     if df.empty:
         return 0
     return int(df["calories"].sum())
+
+
+########################################################
+# Weight functions                                     #
+########################################################
+
+def save_weight(entry: Weight) -> Weight:
+    """Save weight entry."""
+    df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
+
+    entry.id = _generate_id()
+    new_row = pd.DataFrame(
+        [
+            {
+                "id": entry.id,
+                "date": entry.date.isoformat(),
+                "weight_kg": entry.weight_kg,
+            }
+        ]
+    )
+    df = pd.concat([df, new_row], ignore_index=True)
+    df.to_csv(WEIGHT_FILE, index=False)
+    return entry
