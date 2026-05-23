@@ -252,3 +252,18 @@ def get_weight(
     df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
 
     return _filter_by_date(df, from_date, to_date)
+
+def delete_weight(weight_id: str) -> bool:
+    """Delete a weight entry by ID."""
+    df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
+
+    original_len = len(df)
+
+    df = df[df["id"] != weight_id]
+
+    if len(df) == original_len:
+        return False
+
+    df.to_csv(WEIGHT_FILE, index=False)
+
+    return True
