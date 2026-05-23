@@ -343,3 +343,31 @@ Return dict with key numbers.
         "average_protein": int(protein.mean()) if len(protein) > 0 else 0,
         "average_fat": int(fat.mean()) if len(fat) > 0 else 0,
     }
+
+def get_weight_stats(days: int = 30) -> dict:
+    """Calcuylate weight stats: Start weight, end weight, change, average weight."""
+    df = get_weight_trend()
+
+    if df.empty or len(df) < 2:
+        current =float(df["weight_kg"].iloc[-1]) if not df.empty else None
+        return {
+            "current_weight": current,
+            "start_weight": current,
+            "change": 0.0,
+            "trend": "not enough data",
+        }
+    
+    weights = df["weight_kg"].dropna().astype(float).values
+    change = round(float(weights[-1]) - float(weights[0]), 1)
+
+    # Simple trend analysis with NumPy polyfit
+    x = np.arange(len(weights))
+    slope, _ = np.polyfit(x, weights, 1)
+    trend = "down" if slope < -0.05 else "up" if slope > 0.05 else "stable"
+
+    return {
+        "current_weight": round(float(weights[-1]), 1),
+        "start_weight": round(float(weights[0]), 1),
+        "change": change,
+        "trend": trend,
+    }
