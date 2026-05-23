@@ -13,7 +13,7 @@ from typing import Optional
 import pandas as pd
 import numpy as np
 
-from models import Nutrition, Workout
+from models import Nutrition, Weight, Workout
 
 # Path to the data directory
 DATA_DIR = Path("data").parent / "data"
@@ -220,3 +220,61 @@ def get_daily_calories(target_date: date) -> int:
     if df.empty:
         return 0
     return int(df["calories"].sum())
+
+
+########################################################
+# Weight functions                                     #
+########################################################
+
+def save_weight(entry: Weight) -> Weight:
+    """Save weight entry."""
+    df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
+
+    entry.id = _generate_id()
+    new_row = pd.DataFrame(
+        [
+            {
+                "id": entry.id,
+                "date": entry.date.isoformat(),
+                "weight_kg": entry.weight_kg,
+            }
+        ]
+    )
+    df = pd.concat([df, new_row], ignore_index=True)
+    df.to_csv(WEIGHT_FILE, index=False)
+    return entry
+
+def get_weight(
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
+) -> pd.DataFrame:
+    """Get weight entries filtered by optional date range."""
+    df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
+
+    return _filter_by_date(df, from_date, to_date)
+
+def delete_weight(weight_id: str) -> bool:
+    """Delete a weight entry by ID."""
+    df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
+
+    original_len = len(df)
+
+    df = df[df["id"] != weight_id]
+
+    if len(df) == original_len:
+        return False
+
+    df.to_csv(WEIGHT_FILE, index=False)
+
+    return True
+
+def get_weight_trend(
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
+) -> pd.DataFrame:
+    """Get weight trend filtered by optional date range."""
+    df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
+
+    return _filter_by_date(df, from_date, to_date).sort_values(
+        "date"
+    ).reset_index(drop=True)
