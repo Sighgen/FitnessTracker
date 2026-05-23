@@ -74,3 +74,18 @@ def save_workout(entry: WorkoutEntry) -> WorkoutEntry:
     df = pd.concat([df, new_row], ignore_index=True)
     df.to_csv(WORKOUTS_FILE, index=False)
     return entry
+
+def get_workouts(
+        from_date: Optional[date] = None,
+        to_date: Optional[date] = None,
+) -> pd.DataFrame:
+    """Get workouts."""
+    df = _load_csv(WORKOUTS_FILE, WORKOUT_COLS)
+    if df.empty:
+        return df
+    df["date"] = pd.to_datetime(df["date"]).dt.date
+    if from_date:
+        df = df[df["date"] >= from_date]
+    if to_date:
+        df = df[df["date"] <= to_date]
+    return df.sort_values("date", ascending=False).reset_index(drop=True)
