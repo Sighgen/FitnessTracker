@@ -278,3 +278,35 @@ def get_weight_trend(
     return _filter_by_date(df, from_date, to_date).sort_values(
         "date"
     ).reset_index(drop=True)
+
+########################################################
+# Stats functions                                      #
+########################################################
+
+def get_workout_stats(days: int = 30) -> dict:
+    """
+    Calculate workout stats for the past N days.
+    Return dict with key numbers.
+    """
+    from_date = pd.Timestamp.now().date() - pd.Timedelta(days=days)
+    df = get_workouts(from_date=from_date)
+
+    if df.empty:
+        return {
+            "total_workouts": 0,
+            "total_duration": 0,
+            "total_calories": 0,
+            "average_duration": 0,
+            "average_calories": 0,
+        }
+    
+    duration = df ["duration_minutes"].astype(float).values
+    calories = df["calories_burned"].dropna().astype(float).values
+
+    return {
+        "total_workouts": len(df),
+        "total_duration": int(duration.sum()),
+        "total_calories": int(calories.sum()),
+        "average_duration": int(duration.mean()),
+        "average_calories": int(calories.mean()) if len(calories) > 0 else 0,
+    }
