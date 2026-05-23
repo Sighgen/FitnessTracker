@@ -13,7 +13,7 @@ from typing import Optional
 import pandas as pd
 import numpy as np
 
-from models import Workout
+from models import Nutrition, Workout
 
 # Path to the data directory
 DATA_DIR = Path("data").parent / "data"
@@ -85,6 +85,29 @@ def _load_csv(filepath: Path, cols: list[str]) -> pd.DataFrame:
 
     return df
 
+######################################################
+# Helper functions                                   #
+######################################################
+
+def _filter_by_date(
+    df: pd.DataFrame,
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
+) -> pd.DataFrame:
+    """Filter DataFrame by optional date range."""
+    if df.empty:
+        return df
+
+    df["date"] = pd.to_datetime(df["date"]).dt.date
+
+    if from_date:
+        df = df[df["date"] >= from_date]
+
+    if to_date:
+        df = df[df["date"] <= to_date]
+
+    return df.sort_values("date", ascending=False).reset_index(drop=True)
+
 
 #####################################################
 # Workout functions
@@ -124,18 +147,7 @@ def get_workouts(
     """Get workouts filtered by optional date range."""
     df = _load_csv(WORKOUTS_FILE, WORKOUTS_SCHEMA)
 
-    if df.empty:
-        return df
-
-    df["date"] = pd.to_datetime(df["date"]).dt.date
-
-    if from_date:
-        df = df[df["date"] >= from_date]
-
-    if to_date:
-        df = df[df["date"] <= to_date]
-
-    return df.sort_values("date", ascending=False).reset_index(drop=True)
+    return _filter_by_date(df, from_date, to_date)
 
 
 def delete_workout(workout_id: str) -> bool:
@@ -152,3 +164,59 @@ def delete_workout(workout_id: str) -> bool:
     df.to_csv(WORKOUTS_FILE, index=False)
 
     return True
+
+######################################################
+# Nutrition functions                                #
+######################################################
+
+def save_nutrition(entry: Nutrition) -> Nutrition:
+    """Save nutrition entry and return it with generated ID."""
+    df = _load_csv(NUTRITION_FILE, NUTRITION_SCHEMA)
+    entry.id = _generate_id()
+    new_row = pd.DataFrame(
+        [
+            {
+                "id": entry.id,
+                "date": entry.date.isoformat(),
+                "meal_name": entry.meal_name,
+                "calories": entry.calories,
+                "carbs": entry.carbs,
+                "protein": entry.protein,
+                "fat": entry.fat,
+            }
+        ]
+    )
+    df = pd.concat([df, new_row], ignore_index=True)
+    df.to_csv(NUTRITION_FILE, index=False)
+    return entry
+
+def get_nutrition(
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
+) -> pd.DataFrame:
+    """Get nutrition entries filtered by optional date range."""
+    df = _load_csv(NUTRITION_FILE, NUTRITION_SCHEMA)
+
+    return _filter_by_date(df, from_date, to_date)
+
+def delete_nutrition(nutrition_id: str) -> bool:
+    """Delete a nutrition entry by ID."""
+    df = _load_csv(NUTRITION_FILE, NUTRITION_SCHEMA)
+
+    original_len = len(df)
+
+    df = df[df["id"] != nutrition_id]
+
+    if len(df) == original_len:
+        return False
+
+    df.to_csv(NUTRITION_FILE, index=False)
+
+    return True
+
+def get_daily_calories(target_date: date) -> int:
+    """Calculate total calories consumed on a specific date."""
+    df = get_nutrition(from_date=target_date, to_date=target_date)
+    if df.empty:
+        return 0
+    return int(df["calories"].sum())
