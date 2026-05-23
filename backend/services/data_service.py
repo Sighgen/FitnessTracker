@@ -310,3 +310,36 @@ def get_workout_stats(days: int = 30) -> dict:
         "average_duration": int(duration.mean()),
         "average_calories": int(calories.mean()) if len(calories) > 0 else 0,
     }
+
+
+def get_nutrition_stats(days: int = 30) -> dict:
+    """
+Calculate nutrition stats for the past N days.
+Return dict with key numbers.
+    """
+    from_date = pd.Timestamp.now().date() - pd.Timedelta(days=days)
+    df = get_nutrition(from_date=from_date)
+
+    if df.empty:
+        return {
+            "total_meals": 0,
+            "total_calories": 0,
+            "average_calories": 0,
+            "average_carbs": 0,
+            "average_protein": 0,
+            "average_fat": 0,
+        }
+    
+    calories = df["calories"].dropna().astype(float).values
+    carbs = df["carbs"].dropna().astype(float).values
+    protein = df["protein"].dropna().astype(float).values
+    fat = df["fat"].dropna().astype(float).values
+
+    return {
+        "total_meals": len(df),
+        "total_calories": int(calories.sum()),
+        "average_calories": int(calories.mean()) if len(calories) > 0 else 0,
+        "average_carbs": int(carbs.mean()) if len(carbs) > 0 else 0,
+        "average_protein": int(protein.mean()) if len(protein) > 0 else 0,
+        "average_fat": int(fat.mean()) if len(fat) > 0 else 0,
+    }
