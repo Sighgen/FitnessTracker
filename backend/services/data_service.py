@@ -413,3 +413,24 @@ def get_weight_stats(days: int = 30) -> dict:
         "change": change,
         "trend": trend,
     }
+
+#######################################################
+# User goal functions                                 #
+#######################################################
+
+def save_goal(goal: UserGoal) -> UserGoal:
+    """Save a users goal (overwrite existing goal)."""
+    _ensure_data_dir()
+    df = pd.DataFrame(
+        [
+            {
+                "goal_type": goal.goal_type,
+                "target_weight": goal.target_weight,
+                "weekly_workouts": goal.weekly_workouts,
+                "daily_calories": goal.daily_calories,
+                "notes": goal.notes,
+            }
+        ]
+    )
+    df.to_csv(GOALS_FILE, index=False)
+    return goal
