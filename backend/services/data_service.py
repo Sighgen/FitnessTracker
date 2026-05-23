@@ -177,3 +177,23 @@ def save_nutrition(entry: NutritionEntry) -> NutritionEntry:
     df = pd.concat([df, new_row], ignore_index=True)
     df.to_csv(NUTRITION_FILE, index=False)
     return entry
+
+def get_nutrition(
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
+) -> pd.DataFrame:
+    """Get nutrition entries filtered by optional date range."""
+    df = _load_csv(NUTRITION_FILE, NUTRITION_SCHEMA)
+
+    if df.empty:
+        return df
+
+    df["date"] = pd.to_datetime(df["date"]).dt.date
+
+    if from_date:
+        df = df[df["date"] >= from_date]
+
+    if to_date:
+        df = df[df["date"] <= to_date]
+
+    return df.sort_values("date", ascending=False).reset_index(drop=True)
