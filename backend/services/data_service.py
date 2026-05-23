@@ -13,7 +13,7 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
-from models import Nutrition, UserGoal, Weight, Workout
+from backend.models import Nutrition, Goal, Weight, Workout
 
 
 # -----------------------------
@@ -59,9 +59,9 @@ WEIGHT_SCHEMA = [
 
 GOALS_SCHEMA = [
     "goal_type",
-    "target_weight",
-    "weekly_workouts",
-    "daily_calories",
+    "target_weight_kg",
+    "target_workout_minutes",
+    "target_calories",
     "notes",
 ]
 
@@ -363,14 +363,14 @@ def get_weight_stats(days: int = 30) -> dict:
 # GOALS
 # =====================================================
 
-def save_goal(goal: UserGoal) -> UserGoal:
+def save_goal(goal: Goal) -> Goal:
     ensure_data_directory()
 
     df = pd.DataFrame([{
         "goal_type": goal.goal_type,
-        "target_weight": goal.target_weight,
-        "weekly_workouts": goal.weekly_workouts,
-        "daily_calories": goal.daily_calories,
+        "target_weight_kg": goal.target_weight_kg,
+        "target_workout_minutes": goal.target_workout_minutes,
+        "target_calories": goal.target_calories,
         "notes": goal.notes,
     }])
 
@@ -378,7 +378,7 @@ def save_goal(goal: UserGoal) -> UserGoal:
     return goal
 
 
-def get_goal() -> Optional[UserGoal]:
+def get_goal() -> Optional[Goal]:
     df = _load_csv(GOALS_FILE, GOALS_SCHEMA)
 
     if df.empty:
@@ -386,10 +386,10 @@ def get_goal() -> Optional[UserGoal]:
 
     row = df.iloc[0]
 
-    return UserGoal(
+    return Goal(
         goal_type=str(row["goal_type"]),
-        target_weight=float(row["target_weight"]) if pd.notna(row["target_weight"]) else None,
-        weekly_workouts=int(row["weekly_workouts"]),
-        daily_calories=int(row["daily_calories"]) if pd.notna(row["daily_calories"]) else None,
+        target_weight_kg=float(row["target_weight_kg"]) if pd.notna(row["target_weight_kg"]) else None,
+        target_workout_minutes=int(row["target_workout_minutes"]),
+        target_calories=int(row["target_calories"]) if pd.notna(row["target_calories"]) else None,
         notes=str(row["notes"]) if pd.notna(row["notes"]) else None,
     )
