@@ -13,7 +13,7 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
-from models import Nutrition, Weight, Workout
+from models import Nutrition, UserGoal, Weight, Workout
 
 # Path to the data directory
 DATA_DIR = Path("data").parent / "data"
@@ -413,3 +413,54 @@ def get_weight_stats(days: int = 30) -> dict:
         "change": change,
         "trend": trend,
     }
+
+#######################################################
+# User goal functions                                 #
+#######################################################
+
+
+def save_goal(goal: UserGoal) -> UserGoal:
+    """Save a user's goal (overwrite existing goal)."""
+    ensure_data_directory()
+
+    df = pd.DataFrame(
+        [
+            {
+                "goal_type": goal.goal_type,
+                "target_weight": goal.target_weight,
+                "weekly_workouts": goal.weekly_workouts,
+                "daily_calories": goal.daily_calories,
+                "notes": goal.notes,
+            }
+        ]
+    )
+
+    df.to_csv(GOALS_FILE, index=False)
+
+    return goal
+
+
+def get_goal() -> Optional[UserGoal]:
+    """Get user's goal (return None if not set)."""
+    df = _load_csv(GOALS_FILE, GOALS_SCHEMA)
+
+    if df.empty:
+        return None
+
+    row = df.iloc[0]
+
+    return UserGoal(
+        goal_type=str(row["goal_type"]),
+        target_weight=(
+            float(row["target_weight"])
+            if pd.notna(row["target_weight"])
+            else None
+        ),
+        weekly_workouts=int(row["weekly_workouts"]),
+        daily_calories=(
+            int(row["daily_calories"])
+            if pd.notna(row["daily_calories"])
+            else None
+        ),
+        notes=str(row["notes"]) if pd.notna(row["notes"]) else None,
+    )
