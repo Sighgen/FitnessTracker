@@ -197,3 +197,18 @@ def get_nutrition(
         df = df[df["date"] <= to_date]
 
     return df.sort_values("date", ascending=False).reset_index(drop=True)
+
+def delete_nutrition(nutrition_id: str) -> bool:
+    """Delete a nutrition entry by ID."""
+    df = _load_csv(NUTRITION_FILE, NUTRITION_SCHEMA)
+
+    original_len = len(df)
+
+    df = df[df["id"] != nutrition_id]
+
+    if len(df) == original_len:
+        return False
+
+    df.to_csv(NUTRITION_FILE, index=False)
+
+    return True
