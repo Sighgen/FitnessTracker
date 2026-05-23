@@ -152,3 +152,28 @@ def delete_workout(workout_id: str) -> bool:
     df.to_csv(WORKOUTS_FILE, index=False)
 
     return True
+
+######################################################
+# Nutrition functions                                #
+######################################################
+
+def save_nutrition(entry: NutritionEntry) -> NutritionEntry:
+    """Save nutrition entry and return it with generated ID."""
+    df = _load_csv(NUTRITION_FILE, NUTRITION_SCHEMA)
+    entry.id = _generate_id()
+    new_row = pd.DataFrame(
+        [
+            {
+                "id": entry.id,
+                "date": entry.date.isoformat(),
+                "meal_name": entry.meal_name,
+                "calories": entry.calories,
+                "carbs": entry.carbs,
+                "protein": entry.protein,
+                "fat": entry.fat,
+            }
+        ]
+    )
+    df = pd.concat([df, new_row], ignore_index=True)
+    df.to_csv(NUTRITION_FILE, index=False)
+    return entry
