@@ -243,3 +243,12 @@ def save_weight(entry: Weight) -> Weight:
     df = pd.concat([df, new_row], ignore_index=True)
     df.to_csv(WEIGHT_FILE, index=False)
     return entry
+
+def get_weight(
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
+) -> pd.DataFrame:
+    """Get weight entries filtered by optional date range."""
+    df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
+
+    return _filter_by_date(df, from_date, to_date)
