@@ -1,18 +1,19 @@
 """
 Data service module for handling data-related operations.
-Saves in CSV format and provides functions to read and write data.
-Uses pandas for data manipulation and file handling and NumPy for numerical computations.
+
+Saves data in CSV format and provides functions to read and write data.
+Uses pandas for data manipulation and file handling.
 """
 
 import uuid
-from datetime import date, datetime
+from datetime import date
 from pathlib import Path
 from typing import Optional
 
-import numpy as np
 import pandas as pd
+import numpy as np
 
-from models import Workout, Nutrition, Weight, Goal
+from models import Workout
 
 # Path to the data directory
 DATA_DIR = Path("data").parent / "data"
@@ -24,80 +25,130 @@ WEIGHT_FILE = DATA_DIR / "weight.csv"
 GOALS_FILE = DATA_DIR / "goals.csv"
 
 # CSV schema definitions
-WORKOUTS_SCHEMA = ["id", "date", "type", "duration_minutes", "calories_burned", "notes"]
-NUTRITION_SCHEMA = ["date", "meal_name", "calories", "carbs", "protein", "fat"]
+WORKOUTS_SCHEMA = [
+    "id",
+    "date",
+    "type",
+    "duration_minutes",
+    "calories_burned",
+    "notes",
+]
+
+NUTRITION_SCHEMA = [
+    "date",
+    "meal_name",
+    "calories",
+    "carbs",
+    "protein",
+    "fat",
+]
+
 WEIGHT_SCHEMA = ["date", "weight_kg"]
-GOALS_SCHEMA = ["id", "type", "target_value", "start_date", "end_date", "status"]
+
+GOALS_SCHEMA = [
+    "id",
+    "type",
+    "target_value",
+    "start_date",
+    "end_date",
+    "status",
+]
+
 
 def ensure_data_directory() -> None:
-    """Ensure the data directory exists."""
+    """Ensure the data directory and CSV files exist."""
     DATA_DIR.mkdir(exist_ok=True)
+
     for file, cols in [
-        (WORKOUTS_FILE, WORKOUTS_COLS),
-        (NUTRITION_FILE, NUTRITION_COLS),
-        (WEIGHT_FILE, WEIGHT_COLS),
-        (GOALS_FILE, GOALS_COLS),
+        (WORKOUTS_FILE, WORKOUTS_SCHEMA),
+        (NUTRITION_FILE, NUTRITION_SCHEMA),
+        (WEIGHT_FILE, WEIGHT_SCHEMA),
+        (GOALS_FILE, GOALS_SCHEMA),
     ]:
         if not file.exists():
             pd.DataFrame(columns=cols).to_csv(file, index=False)
-    
+
 
 def _generate_id() -> str:
-    """Generate a unique ID for workouts and goals."""
+    """Generate a unique ID."""
     return str(uuid.uuid4())
 
 
 def _load_csv(filepath: Path, cols: list[str]) -> pd.DataFrame:
-    """Load CSV files into a DataFrame, ensuring the correct columns, if the file is empty."""
-    _ensure_data_dir()
+    """Load CSV file into a DataFrame."""
+    ensure_data_directory()
+
     df = pd.read_csv(filepath)
+
     if df.empty:
         return pd.DataFrame(columns=cols)
+
     return df
 
+
 #####################################################
-# Workout functions                                 #
+# Workout functions
 #####################################################
 
-def save_workout(entry: WorkoutEntry) -> WorkoutEntry:
-    """Save a workout entry . retunrn generated id."""
-    df = _load_csv(WORKOUTS_FILE, WORKOUTS_COlS)
+
+def save_workout(entry: Workout) -> Workout:
+    """Save a workout entry and return it with generated ID."""
+    df = _load_csv(WORKOUTS_FILE, WORKOUTS_SCHEMA)
+
     entry.id = _generate_id()
-    new_row = pd.DataFrame([{
-        "id": entry.id,
-        "date": entry.date.isoformat(),
-        "type": entry.type,
-        "duration_minutes": entry.duration_minutes,
-        "calories_burned": entry.calories_burned,
-        "notes": entry.notes,
-    }])
+
+    new_row = pd.DataFrame(
+        [
+            {
+                "id": entry.id,
+                "date": entry.date.isoformat(),
+                "type": entry.type,
+                "duration_minutes": entry.duration_minutes,
+                "calories_burned": entry.calories_burned,
+                "notes": entry.notes,
+            }
+        ]
+    )
+
     df = pd.concat([df, new_row], ignore_index=True)
+
     df.to_csv(WORKOUTS_FILE, index=False)
+
     return entry
 
+
 def get_workouts(
-        from_date: Optional[date] = None,
-        to_date: Optional[date] = None,
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
 ) -> pd.DataFrame:
-    """Get workouts."""
-    df = _load_csv(WORKOUTS_FILE, WORKOUT_COLS)
+    """Get workouts filtered by optional date range."""
+    df = _load_csv(WORKOUTS_FILE, WORKOUTS_SCHEMA)
+
     if df.empty:
         return df
+
     df["date"] = pd.to_datetime(df["date"]).dt.date
+
     if from_date:
         df = df[df["date"] >= from_date]
+
     if to_date:
         df = df[df["date"] <= to_date]
+
     return df.sort_values("date", ascending=False).reset_index(drop=True)
 
 
 def delete_workout(workout_id: str) -> bool:
-    """Delete a workout. Returns True if deleted."""
-    df = _load_csv(WORKOUTS_FILE, WORKOUTS_COLS)
-    original_len = len(df)
-    df = df[df["id"] != workout_id]
-    if len(df) == original_len:
-        return False  # No workout found with the given ID
-    df.to_csv(WORKOUTS_FILE, index=False)
-    return True
+    """Delete a workout by ID."""
+    df = _load_csv(WORKOUTS_FILE, WORKOUTS_SCHEMA)
 
+    original_len = len(df)
+
+    df = df[df["id"] != workout_id]
+
+    if len(df) == original_len:
+        return False
+
+    df.to_csv(WORKOUTS_FILE, index=False)
+
+    return True
