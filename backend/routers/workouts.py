@@ -5,14 +5,11 @@ Endpoints for workouts.
 from datetime import date
 from typing import Optional
 
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-
 from backend.models import Workout
 from backend.services import data_service as ds
-
 
 router = APIRouter(prefix="/workouts", tags=["workouts"])
 
@@ -33,9 +30,31 @@ class WorkoutOut(WorkoutIn):
     id: str
 
 
+def _safe_int(value) -> Optional[int]:
+    """Safely convert values coming from pandas (handles NaN)."""
+    try:
+        if value is None:
+            return None
+        if str(value).lower() == "nan":
+            return None
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _safe_str(value) -> Optional[str]:
+    """Safely convert string fields from pandas."""
+    if value is None:
+        return None
+    if str(value).lower() == "nan":
+        return None
+    return str(value)
+
+
 @router.post("/", response_model=WorkoutOut, status_code=201)
 def create_workout(workout: WorkoutIn) -> WorkoutOut:
     """Create a new workout entry."""
+
     try:
         entry = Workout(**workout.model_dump())
         saved = ds.save_workout(entry)
@@ -71,20 +90,10 @@ def list_workouts(
         WorkoutOut(
             id=str(row["id"]),
             date=row["date"],
-            workout_type=row["type"],
-            duration_minutes=row["duration_minutes"],
-            calories_burned=(
-                int(row["calories_burned"])
-                if row["calories_burned"]
-                and str(row["calories_burned"]) != "nan"
-                else None
-            ),
-            notes=(
-                str(row["notes"])
-                if row["notes"]
-                and str(row["notes"]) != "nan"
-                else None
-            ),
+            workout_type=str(row["type"]),
+            duration_minutes=int(row["duration_minutes"]),
+            calories_burned=_safe_int(row["calories_burned"]),
+            notes=_safe_str(row["notes"]),
         )
         for _, row in df.iterrows()
     ]

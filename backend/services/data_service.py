@@ -8,12 +8,12 @@ Uses pandas for data manipulation and file handling.
 import uuid
 from datetime import date
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 import pandas as pd
 
-from backend.models import Nutrition, Goal, Weight, Workout
+from backend.models import Goal, Nutrition, Weight, Workout
 
 
 # -----------------------------
@@ -115,6 +115,17 @@ def _filter_by_date(
         df = df[df["date"] <= to_date]
 
     return df.sort_values("date", ascending=False).reset_index(drop=True)
+
+
+def _safe_float(value: Optional[Union[str, int, float]]) -> Optional[float]:
+    """Safely convert values coming from CSV into float."""
+    try:
+        if value is None:
+            return None
+        parsed = float(value)
+        return parsed if parsed >= 0 else None
+    except (TypeError, ValueError):
+        return None
 
 
 # =====================================================
@@ -258,26 +269,6 @@ def delete_weight(weight_id: str) -> bool:
     df.to_csv(WEIGHT_FILE, index=False)
     return True
 
-def get_weight_entries(
-    from_date: Optional[date] = None,
-    to_date: Optional[date] = None,
-) -> pd.DataFrame:
-    """Get weight entries optionally filtered by date range."""
-
-    df = pd.read_csv(WEIGHT_FILE)
-
-    if df.empty:
-        return df
-
-    df["date"] = pd.to_datetime(df["date"]).dt.date
-
-    if from_date:
-        df = df[df["date"] >= from_date]
-
-    if to_date:
-        df = df[df["date"] <= to_date]
-
-    return df
 
 def get_weight_trend(
     from_date: Optional[date] = None,
@@ -408,8 +399,16 @@ def get_goal() -> Optional[Goal]:
 
     return Goal(
         goal_type=str(row["goal_type"]),
-        target_weight_kg=float(row["target_weight_kg"]) if pd.notna(row["target_weight_kg"]) else None,
+        target_weight_kg=(
+            float(row["target_weight_kg"])
+            if pd.notna(row["target_weight_kg"])
+            else None
+        ),
         target_workout_minutes=int(row["target_workout_minutes"]),
-        target_calories=int(row["target_calories"]) if pd.notna(row["target_calories"]) else None,
+        target_calories=(
+            int(row["target_calories"])
+            if pd.notna(row["target_calories"])
+            else None
+        ),
         notes=str(row["notes"]) if pd.notna(row["notes"]) else None,
     )

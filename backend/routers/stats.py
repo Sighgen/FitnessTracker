@@ -4,10 +4,8 @@ Endpoints for stats.
 
 from typing import Optional
 
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-
 
 from backend.models import Goal
 from backend.services import data_service as ds
@@ -15,56 +13,54 @@ from backend.services import data_service as ds
 router = APIRouter(tags=["stats"])
 
 
-# ------------------------------------------------------------------
-# Stats output models
-# ------------------------------------------------------------------
-
+# =====================================================
+# STATS MODELS
+# =====================================================
 
 class WorkoutStatsOut(BaseModel):
     """Output model for workout statistics."""
 
     total_workouts: int
-    total_duration_minutes: int
-    total_calories_burned: Optional[int] = None
-    avg_duration_minutes: float
-    avg_calories_burned: Optional[float] = None
-    most_common_workout_type: Optional[str] = None
+    total_duration: int
+    total_calories: int
+    average_duration: int
+    average_calories: int
 
 
 class WeightStatsOut(BaseModel):
     """Output model for weight statistics."""
 
-    average_weight: float
-    weight_change: Optional[float] = None
-    weight_change_percentage: Optional[float] = None
-    current_weight: Optional[float] = None
+    current_weight: Optional[float]
+    start_weight: Optional[float]
+    change: float
     trend: str
 
 
-@router.get("/stats/workouts", response_model=WorkoutStatsOut, tags=["stats"])
+# =====================================================
+# STATS ROUTES
+# =====================================================
+
+@router.get("/stats/workouts", response_model=WorkoutStatsOut)
 def workout_stats(days: int = 30) -> WorkoutStatsOut:
     """Get workout statistics for the past N days."""
-
     return WorkoutStatsOut(**ds.get_workout_stats(days=days))
 
 
-@router.get("/stats/weight", response_model=WeightStatsOut, tags=["stats"])
+@router.get("/stats/weight", response_model=WeightStatsOut)
 def weight_stats(days: int = 30) -> WeightStatsOut:
     """Get weight statistics for the past N days."""
-
     return WeightStatsOut(**ds.get_weight_stats(days=days))
 
 
-# ------------------------------------------------------------------
-# User goals
-# ------------------------------------------------------------------
-
+# =====================================================
+# GOALS
+# =====================================================
 
 class GoalIn(BaseModel):
     """Input model for fitness goals."""
 
-    goal_type: str = Field(..., min_length=1, example="weight_loss")
-    target_weight: Optional[float] = Field(None, gt=0)
+    goal_type: str = Field(..., min_length=1)
+    target_weight_kg: Optional[float] = Field(None, gt=0)
     weekly_workouts: int = Field(3, ge=1, le=14)
     daily_calorie_target: Optional[int] = Field(None, ge=0)
     notes: Optional[str] = None
@@ -73,18 +69,28 @@ class GoalIn(BaseModel):
 class GoalOut(GoalIn):
     """Output model for fitness goals."""
 
+    id: Optional[str] = None
 
-@router.post("/goals", response_model=GoalOut, status_code=201, tags=["goal"])
+
+# -----------------------------------------------------
+# Save goal
+# -----------------------------------------------------
+
+@router.post("/goals", response_model=GoalOut, status_code=201)
 def save_goal(body: GoalIn) -> GoalOut:
     """Save user fitness goal."""
 
     goal = Goal(**body.model_dump())
-    ds.save_goal(goal)
+    saved = ds.save_goal(goal)
 
-    return GoalOut(**body.model_dump())
+    return GoalOut(**body.model_dump(), id=saved.id)
 
 
-@router.get("/goals", response_model=GoalOut, tags=["goal"])
+# -----------------------------------------------------
+# Get goal
+# -----------------------------------------------------
+
+@router.get("/goals", response_model=GoalOut)
 def get_goal() -> GoalOut:
     """Get user fitness goal."""
 
@@ -97,8 +103,9 @@ def get_goal() -> GoalOut:
         )
 
     return GoalOut(
+        id=goal.id,
         goal_type=goal.goal_type,
-        target_weight=goal.target_weight_kg,
+        target_weight_kg=goal.target_weight_kg,
         weekly_workouts=goal.weekly_workouts,
         daily_calorie_target=goal.daily_calorie_target,
         notes=goal.notes,

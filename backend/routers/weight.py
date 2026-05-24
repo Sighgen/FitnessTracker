@@ -5,10 +5,8 @@ Endpoints for weight.
 from datetime import date
 from typing import Optional
 
-
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-
 
 from backend.models import Weight
 from backend.services import data_service as ds
@@ -66,9 +64,9 @@ def list_weight_entries(
 
     return [
         WeightOut(
-            date=row["date"],
-            weight_kg=row["weight"],
             id=str(row["id"]),
+            date=row["date"],
+            weight_kg=float(row["weight_kg"]),  # FIXED
         )
         for _, row in df.iterrows()
     ]
