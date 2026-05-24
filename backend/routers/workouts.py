@@ -2,18 +2,15 @@
 Endpoints for workouts.
 """
 
-import sys
 from datetime import date
-from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from backend.models import Workout
+from backend.services import data_service as ds
 
-from models import Workout
-from services import data_service as ds
 
 router = APIRouter(prefix="/workouts", tags=["workouts"])
 

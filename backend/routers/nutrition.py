@@ -2,18 +2,15 @@
 Endpoints for nutrition.
 """
 
-import sys
 from datetime import date
-from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from models import Nutrition
-from services import data_service as ds
+from backend.models import Nutrition
+from backend.services import data_service as ds
 
 router = APIRouter(prefix="/nutrition", tags=["nutrition"])
 
