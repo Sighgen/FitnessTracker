@@ -8,7 +8,7 @@ from backend.services.data_service import _generate_id
 @dataclass
 class Workout:
     id: str = field(default_factory=_generate_id)
-    date: Date = None
+    date: Optional[Date] = None
     type: str = ""
     duration_minutes: int = 0
     calories_burned: Optional[int] = None
@@ -22,7 +22,7 @@ class Workout:
 @dataclass
 class Nutrition:
     id: str = field(default_factory=_generate_id)
-    date: Date = None
+    date: Optional[Date] = None
     meal_name: str = ""
     calories: int = 0
     carbs: Optional[int] = None
@@ -33,7 +33,7 @@ class Nutrition:
 @dataclass
 class Weight:
     id: str = field(default_factory=_generate_id)
-    date: Date = None
+    date: Optional[Date] = None
     weight_kg: float = 0.0
 
 
