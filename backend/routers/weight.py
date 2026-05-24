@@ -2,14 +2,14 @@
 Endpoints for weight.
 """
 
+import sys
 from datetime import date
+from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-import sys
-from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from models import Weight
@@ -25,7 +25,6 @@ class WeightIn(BaseModel):
     weight_kg: float = Field(..., gt=0, le=500)
 
 
-
 class WeightOut(WeightIn):
     """Output model for weight entries."""
 
@@ -35,13 +34,22 @@ class WeightOut(WeightIn):
 @router.post("/", response_model=WeightOut, status_code=201)
 def create_weight_entry(body: WeightIn) -> WeightOut:
     """Create a new weight entry."""
+
     try:
         entry = Weight(**body.model_dump())
         saved = ds.save_weight(entry)
-        return WeightOut(**body.model_dump(), id=saved.id)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e)) from e
-    
+
+        return WeightOut(
+            **body.model_dump(),
+            id=saved.id,
+        )
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=422,
+            detail=str(error),
+        ) from error
+
 
 @router.get("/", response_model=list[WeightOut])
 def list_weight_entries(
@@ -49,9 +57,15 @@ def list_weight_entries(
     to_date: Optional[date] = None,
 ) -> list[WeightOut]:
     """List weight entries, optionally filtered by date range."""
-    df =ds.get_weight_entries(from_date=from_date, to_date=to_date)
+
+    df = ds.get_weight_entries(
+        from_date=from_date,
+        to_date=to_date,
+    )
+
     if df.empty:
         return []
+
     return [
         WeightOut(
             date=row["date"],
