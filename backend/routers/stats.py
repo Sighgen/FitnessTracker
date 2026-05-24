@@ -11,8 +11,8 @@ from pydantic import BaseModel, Field
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from models import Goal
-from services import data_service as ds
+from backend.models import Goal
+from backend.services import data_service as ds
 
 router = APIRouter(tags=["stats"])
 
