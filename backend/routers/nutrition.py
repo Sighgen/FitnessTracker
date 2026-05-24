@@ -3,7 +3,7 @@ Endpoints for nutrition.
 """
 
 from datetime import date
-from typing import Optional
+from typing import Optional, Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field

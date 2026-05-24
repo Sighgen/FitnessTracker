@@ -8,9 +8,8 @@ Uses pandas for data manipulation and file handling.
 import uuid
 from datetime import date
 from pathlib import Path
-from typing import Optional, Union
+from typing import Union, Optional
 
-import numpy as np
 import pandas as pd
 
 from backend.models import Goal, Nutrition, Weight, Workout
@@ -301,37 +300,6 @@ def get_weight_trend(
     )
 
 
-def get_weight_stats(days: int = 30) -> dict:
-    from_date = pd.Timestamp.now().date() - pd.Timedelta(days=days)
-
-    df = get_weight_trend(from_date=from_date)
-
-    if df.empty:
-        return {
-            "average_weight": 0.0,
-            "weight_change": None,
-            "weight_change_percentage": None,
-            "current_weight": None,
-            "trend": "no data",
-        }
-
-    weights = df["weight_kg"].astype(float).values
-
-    current = float(weights[-1])
-    start = float(weights[0])
-
-    change = current - start
-    pct = (change / start * 100) if start else None
-
-    return {
-        "average_weight": float(weights.mean()),
-        "weight_change": change,
-        "weight_change_percentage": pct,
-        "current_weight": current,
-        "trend": "down" if change < 0 else "up" if change > 0 else "stable",
-    }
-
-
 # =====================================================
 # STATS
 # =====================================================
@@ -393,30 +361,32 @@ def get_nutrition_stats(days: int = 30) -> dict:
 
 def get_weight_stats(days: int = 30) -> dict:
     from_date = pd.Timestamp.now().date() - pd.Timedelta(days=days)
+
     df = get_weight_trend(from_date=from_date)
 
-    if df.empty or len(df) < 2:
-        current = float(df["weight_kg"].iloc[-1]) if not df.empty else None
+    if df.empty:
         return {
-            "current_weight": current,
-            "start_weight": current,
-            "change": 0.0,
-            "trend": "not enough data",
+            "average_weight": 0.0,
+            "weight_change": None,
+            "weight_change_percentage": None,
+            "current_weight": None,
+            "trend": "no data",
         }
 
-    weights = df["weight_kg"].dropna().astype(float).values
-    change = round(weights[-1] - weights[0], 1)
+    weights = df["weight_kg"].astype(float).values
 
-    x = np.arange(len(weights))
-    slope, _ = np.polyfit(x, weights, 1)
+    current = float(weights[-1])
+    start = float(weights[0])
 
-    trend = "down" if slope < -0.05 else "up" if slope > 0.05 else "stable"
+    change = current - start
+    pct = (change / start * 100) if start else None
 
     return {
-        "current_weight": round(weights[-1], 1),
-        "start_weight": round(weights[0], 1),
-        "change": change,
-        "trend": trend,
+        "average_weight": float(weights.mean()),
+        "weight_change": change,
+        "weight_change_percentage": pct,
+        "current_weight": current,
+        "trend": "down" if change < 0 else "up" if change > 0 else "stable",
     }
 
 

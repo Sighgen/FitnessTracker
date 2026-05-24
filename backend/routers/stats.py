@@ -2,13 +2,12 @@
 Endpoints for stats.
 """
 
-from datetime import date
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from backend.models import Goal, Workout, Nutrition
+from backend.models import Goal
 from backend.services import data_service as ds
 
 router = APIRouter(tags=["stats"])
