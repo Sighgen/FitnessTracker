@@ -249,10 +249,12 @@ def save_weight(entry: Weight) -> Weight:
     return entry
 
 
-def get_weight(
+def get_weight_entries(
     from_date: Optional[date] = None,
     to_date: Optional[date] = None,
 ) -> pd.DataFrame:
+    """Get weight entries optionally filtered by date range."""
+
     df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
     return _filter_by_date(df, from_date, to_date)
 
