@@ -18,6 +18,7 @@ router = APIRouter(tags=["stats"])
 # STATS MODELS
 # =====================================================
 
+
 class WorkoutStatsOut(BaseModel):
     """Output model for workout statistics."""
 
@@ -41,6 +42,7 @@ class WeightStatsOut(BaseModel):
 # STATS ROUTES
 # =====================================================
 
+
 @router.get("/stats/workouts", response_model=WorkoutStatsOut)
 def workout_stats(days: int = 30) -> WorkoutStatsOut:
     """Get workout statistics for the past N days."""
@@ -56,6 +58,7 @@ def weight_stats(days: int = 30) -> WeightStatsOut:
 # =====================================================
 # GOALS
 # =====================================================
+
 
 class GoalIn(BaseModel):
     """Input model for fitness goals."""
@@ -77,6 +80,7 @@ class GoalOut(GoalIn):
 # Save goal
 # -----------------------------------------------------
 
+
 @router.post("/goals", response_model=GoalOut, status_code=201)
 def save_goal(body: GoalIn) -> GoalOut:
     """Save user fitness goal."""
@@ -90,6 +94,7 @@ def save_goal(body: GoalIn) -> GoalOut:
 # -----------------------------------------------------
 # Get goal
 # -----------------------------------------------------
+
 
 @router.get("/goals", response_model=GoalOut)
 def get_goal() -> GoalOut:

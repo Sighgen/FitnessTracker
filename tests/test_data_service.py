@@ -44,6 +44,7 @@ class FakeGoal:
         self.target_calories = 2000
         self.notes = "test goal"
 
+
 # -----------------------------
 # Fixtures
 # -----------------------------
@@ -65,6 +66,7 @@ def temp_data_dir(tmp_path, monkeypatch):
 # -----------------------------
 # WORKOUT TESTS
 # -----------------------------
+
 
 def test_save_and_get_workout():
     w = FakeWorkout()
@@ -88,6 +90,7 @@ def test_delete_workout():
 # -----------------------------
 # NUTRITION TESTS
 # -----------------------------
+
 
 def test_save_and_get_nutrition():
     n = FakeNutrition()
@@ -118,6 +121,7 @@ def test_delete_nutrition():
 # WEIGHT TESTS
 # -----------------------------
 
+
 def test_save_and_get_weight():
     w = FakeWeight()
     ds.save_weight(w)
@@ -139,6 +143,7 @@ def test_weight_trend():
 # STATS TESTS
 # -----------------------------
 
+
 def test_workout_stats():
     ds.save_workout(FakeWorkout())
 
@@ -156,6 +161,7 @@ def test_nutrition_stats():
 # -----------------------------
 # GOALS TESTS
 # -----------------------------
+
 
 def test_save_and_get_goal():
     g = FakeGoal()
