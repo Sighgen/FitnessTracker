@@ -9,7 +9,7 @@ from typing import Optional
 class Workout:
     """Represents a workout session."""
 
-    id: int
+    id: Optional[str] = None
     date: Date
     type: str
     duration_minutes: int
@@ -29,6 +29,7 @@ class Workout:
 class Nutrition:
     """Represents nutritional information for a meal."""
 
+    id: Optional[str] = None
     date: Date
     meal_name: str
     calories: int
@@ -55,6 +56,7 @@ class Nutrition:
 class Weight:
     """Represents a weight entry."""
 
+    id: Optional[str] = None
     date: Date
     weight_kg: float
 
@@ -68,8 +70,11 @@ class Weight:
 class Goal:
     """Represents a user fitness goal."""
 
+    id: Optional[str] = None
     goal_type: str
     target_weight_kg: Optional[float] = None
     target_workout_minutes: Optional[int] = None
     target_calories: Optional[int] = None
     notes: Optional[str] = None
+    weekly_workouts: int
+    daily_calorie_target: Optional[int] = None

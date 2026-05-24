@@ -258,6 +258,26 @@ def delete_weight(weight_id: str) -> bool:
     df.to_csv(WEIGHT_FILE, index=False)
     return True
 
+def get_weight_entries(
+    from_date: Optional[date] = None,
+    to_date: Optional[date] = None,
+) -> pd.DataFrame:
+    """Get weight entries optionally filtered by date range."""
+
+    df = pd.read_csv(WEIGHT_FILE)
+
+    if df.empty:
+        return df
+
+    df["date"] = pd.to_datetime(df["date"]).dt.date
+
+    if from_date:
+        df = df[df["date"] >= from_date]
+
+    if to_date:
+        df = df[df["date"] <= to_date]
+
+    return df
 
 def get_weight_trend(
     from_date: Optional[date] = None,

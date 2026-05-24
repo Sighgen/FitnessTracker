@@ -5,8 +5,10 @@ Endpoints for workouts.
 from datetime import date
 from typing import Optional
 
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
+
 
 from backend.models import Workout
 from backend.services import data_service as ds

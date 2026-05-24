@@ -5,8 +5,10 @@ Endpoints for weight.
 from datetime import date
 from typing import Optional
 
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
+
 
 from backend.models import Weight
 from backend.services import data_service as ds
