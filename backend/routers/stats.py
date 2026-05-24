@@ -2,14 +2,10 @@
 Endpoints for stats.
 """
 
-import sys
-from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from backend.models import Goal
 from backend.services import data_service as ds
