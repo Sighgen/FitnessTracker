@@ -2,20 +2,21 @@
 Endpoints for nutrition.
 """
 
+import sys
 from datetime import date
+from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-import sys
-from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from models import Nutrition
 from services import data_service as ds
 
 router = APIRouter(prefix="/nutrition", tags=["nutrition"])
+
 
 class NutritionIn(BaseModel):
     """Input model for nutrition entries."""
@@ -40,17 +41,26 @@ class DailyCaloriesOut(BaseModel):
     date: date
     total_calories: int
 
+
 @router.post("/", response_model=NutritionOut, status_code=201)
 def create_nutrition_entry(nutrition: NutritionIn) -> NutritionOut:
     """Create a new nutrition entry."""
+
     try:
         entry = Nutrition(**nutrition.model_dump())
         saved = ds.save_nutrition(entry)
 
-        return NutritionOut(**body.model_dump(), id=saved.id)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    
+        return NutritionOut(
+            **nutrition.model_dump(),
+            id=saved.id,
+        )
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error),
+        ) from error
+
 
 @router.get("/", response_model=list[NutritionOut])
 def list_nutrition_entries(
@@ -58,32 +68,43 @@ def list_nutrition_entries(
     to_date: Optional[date] = None,
 ) -> list[NutritionOut]:
     """List nutrition entries, optionally filtered by date range."""
-    df = ds.get_nutrition(from_date=from_date, to_date=to_date)
+
+    df = ds.get_nutrition(
+        from_date=from_date,
+        to_date=to_date,
+    )
+
     if df.empty:
         return []
-    
-    def _safe_float(value) -> Optional[float]:
+
+    def _safe_float(value: object) -> Optional[float]:
         try:
-            f = float(value)
-            return f if f >= 0 else None
+            parsed = float(value)
+            return parsed if parsed >= 0 else None
         except (TypeError, ValueError):
             return None
-        
+
     return [
         NutritionOut(
-            id=row['id'],
-            date=row['date'],
-            meal_name=row['meal_name'],
-            calories=row['calories'],
-            carbs=_safe_float(row['carbs']),
-            protein=_safe_float(row['protein']),
-            fat=_safe_float(row['fat'])
+            id=row["id"],
+            date=row["date"],
+            meal_name=row["meal_name"],
+            calories=row["calories"],
+            carbs=_safe_float(row["carbs"]),
+            protein=_safe_float(row["protein"]),
+            fat=_safe_float(row["fat"]),
         )
         for _, row in df.iterrows()
     ]
 
+
 @router.get("/daily/{target_date}", response_model=DailyCaloriesOut)
 def get_daily_calories(target_date: date) -> DailyCaloriesOut:
     """Get total calories for a specific date."""
+
     total = ds.get_daily_calories(target_date)
-    return DailyCaloriesOut(date=target_date, total_calories=total)
+
+    return DailyCaloriesOut(
+        date=target_date,
+        total_calories=total,
+    )
