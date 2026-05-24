@@ -300,6 +300,35 @@ def get_weight_trend(
         .reset_index(drop=True)
     )
 
+def get_weight_stats(days: int = 30) -> dict:
+    from_date = pd.Timestamp.now().date() - pd.Timedelta(days=days)
+
+    df = get_weight_trend(from_date=from_date)
+
+    if df.empty:
+        return {
+            "average_weight": 0.0,
+            "weight_change": None,
+            "weight_change_percentage": None,
+            "current_weight": None,
+            "trend": "no data",
+        }
+
+    weights = df["weight_kg"].astype(float).values
+
+    current = float(weights[-1])
+    start = float(weights[0])
+
+    change = current - start
+    pct = (change / start * 100) if start else None
+
+    return {
+        "average_weight": float(weights.mean()),
+        "weight_change": change,
+        "weight_change_percentage": pct,
+        "current_weight": current,
+        "trend": "down" if change < 0 else "up" if change > 0 else "stable",
+    }
 
 # =====================================================
 # STATS
