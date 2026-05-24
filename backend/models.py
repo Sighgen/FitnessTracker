@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import date as Date
+from datetime import date
 from typing import Optional
 
 from backend.services.data_service import _generate_id
@@ -8,7 +8,7 @@ from backend.services.data_service import _generate_id
 @dataclass
 class Workout:
     id: str = field(default_factory=_generate_id)
-    date: Optional[Date] = None
+    date: date
     type: str = ""
     duration_minutes: int = 0
     calories_burned: Optional[int] = None
@@ -22,7 +22,7 @@ class Workout:
 @dataclass
 class Nutrition:
     id: str = field(default_factory=_generate_id)
-    date: Optional[Date] = None
+    date: date
     meal_name: str = ""
     calories: int = 0
     carbs: Optional[int] = None
@@ -33,7 +33,7 @@ class Nutrition:
 @dataclass
 class Weight:
     id: str = field(default_factory=_generate_id)
-    date: Optional[Date] = None
+    date: date
     weight_kg: float = 0.0
 
 
