@@ -8,7 +8,7 @@ Uses pandas for data manipulation and file handling.
 import uuid
 from datetime import date
 from pathlib import Path
-from typing import Union, Optional
+from typing import Optional, Union
 
 import pandas as pd
 
