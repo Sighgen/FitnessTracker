@@ -300,6 +300,7 @@ def get_weight_trend(
         .reset_index(drop=True)
     )
 
+
 def get_weight_stats(days: int = 30) -> dict:
     from_date = pd.Timestamp.now().date() - pd.Timedelta(days=days)
 
@@ -329,6 +330,7 @@ def get_weight_stats(days: int = 30) -> dict:
         "current_weight": current,
         "trend": "down" if change < 0 else "up" if change > 0 else "stable",
     }
+
 
 # =====================================================
 # STATS
