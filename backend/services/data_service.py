@@ -8,12 +8,11 @@ Uses pandas for data manipulation and file handling.
 import uuid
 from datetime import date
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
-import numpy as np
 import pandas as pd
 
-from backend.models import Nutrition, Goal, Weight, Workout
+from backend.models import Goal, Nutrition, Weight, Workout
 
 
 # -----------------------------
@@ -70,6 +69,7 @@ GOALS_SCHEMA = [
 # Setup
 # -----------------------------
 
+
 def ensure_data_directory() -> None:
     DATA_DIR.mkdir(exist_ok=True)
 
@@ -117,23 +117,39 @@ def _filter_by_date(
     return df.sort_values("date", ascending=False).reset_index(drop=True)
 
 
+def _safe_float(value: Optional[Union[str, int, float]]) -> Optional[float]:
+    """Safely convert values coming from CSV into float."""
+    try:
+        if value is None:
+            return None
+        parsed = float(value)
+        return parsed if parsed >= 0 else None
+    except (TypeError, ValueError):
+        return None
+
+
 # =====================================================
 # WORKOUTS
 # =====================================================
+
 
 def save_workout(entry: Workout) -> Workout:
     df = _load_csv(WORKOUTS_FILE, WORKOUTS_SCHEMA)
 
     entry.id = _generate_id()
 
-    new_row = pd.DataFrame([{
-        "id": entry.id,
-        "date": entry.date.isoformat(),
-        "type": entry.type,
-        "duration_minutes": entry.duration_minutes,
-        "calories_burned": entry.calories_burned,
-        "notes": entry.notes,
-    }])
+    new_row = pd.DataFrame(
+        [
+            {
+                "id": entry.id,
+                "date": entry.date.isoformat(),
+                "type": entry.type,
+                "duration_minutes": entry.duration_minutes,
+                "calories_burned": entry.calories_burned,
+                "notes": entry.notes,
+            }
+        ]
+    )
 
     df = pd.concat([df, new_row], ignore_index=True)
     df.to_csv(WORKOUTS_FILE, index=False)
@@ -166,20 +182,25 @@ def delete_workout(workout_id: str) -> bool:
 # NUTRITION
 # =====================================================
 
+
 def save_nutrition(entry: Nutrition) -> Nutrition:
     df = _load_csv(NUTRITION_FILE, NUTRITION_SCHEMA)
 
     entry.id = _generate_id()
 
-    new_row = pd.DataFrame([{
-        "id": entry.id,
-        "date": entry.date.isoformat(),
-        "meal_name": entry.meal_name,
-        "calories": entry.calories,
-        "carbs": entry.carbs,
-        "protein": entry.protein,
-        "fat": entry.fat,
-    }])
+    new_row = pd.DataFrame(
+        [
+            {
+                "id": entry.id,
+                "date": entry.date.isoformat(),
+                "meal_name": entry.meal_name,
+                "calories": entry.calories,
+                "carbs": entry.carbs,
+                "protein": entry.protein,
+                "fat": entry.fat,
+            }
+        ]
+    )
 
     df = pd.concat([df, new_row], ignore_index=True)
     df.to_csv(NUTRITION_FILE, index=False)
@@ -221,16 +242,21 @@ def get_daily_calories(target_date: date) -> int:
 # WEIGHT
 # =====================================================
 
+
 def save_weight(entry: Weight) -> Weight:
     df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
 
     entry.id = _generate_id()
 
-    new_row = pd.DataFrame([{
-        "id": entry.id,
-        "date": entry.date.isoformat(),
-        "weight_kg": entry.weight_kg,
-    }])
+    new_row = pd.DataFrame(
+        [
+            {
+                "id": entry.id,
+                "date": entry.date.isoformat(),
+                "weight_kg": entry.weight_kg,
+            }
+        ]
+    )
 
     df = pd.concat([df, new_row], ignore_index=True)
     df.to_csv(WEIGHT_FILE, index=False)
@@ -238,10 +264,12 @@ def save_weight(entry: Weight) -> Weight:
     return entry
 
 
-def get_weight(
+def get_weight_entries(
     from_date: Optional[date] = None,
     to_date: Optional[date] = None,
 ) -> pd.DataFrame:
+    """Get weight entries optionally filtered by date range."""
+
     df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
     return _filter_by_date(df, from_date, to_date)
 
@@ -275,6 +303,7 @@ def get_weight_trend(
 # =====================================================
 # STATS
 # =====================================================
+
 
 def get_workout_stats(days: int = 30) -> dict:
     from_date = pd.Timestamp.now().date() - pd.Timedelta(days=days)
@@ -332,30 +361,32 @@ def get_nutrition_stats(days: int = 30) -> dict:
 
 def get_weight_stats(days: int = 30) -> dict:
     from_date = pd.Timestamp.now().date() - pd.Timedelta(days=days)
+
     df = get_weight_trend(from_date=from_date)
 
-    if df.empty or len(df) < 2:
-        current = float(df["weight_kg"].iloc[-1]) if not df.empty else None
+    if df.empty:
         return {
-            "current_weight": current,
-            "start_weight": current,
-            "change": 0.0,
-            "trend": "not enough data",
+            "average_weight": 0.0,
+            "weight_change": None,
+            "weight_change_percentage": None,
+            "current_weight": None,
+            "trend": "no data",
         }
 
-    weights = df["weight_kg"].dropna().astype(float).values
-    change = round(weights[-1] - weights[0], 1)
+    weights = df["weight_kg"].astype(float).values
 
-    x = np.arange(len(weights))
-    slope, _ = np.polyfit(x, weights, 1)
+    current = float(weights[-1])
+    start = float(weights[0])
 
-    trend = "down" if slope < -0.05 else "up" if slope > 0.05 else "stable"
+    change = current - start
+    pct = (change / start * 100) if start else None
 
     return {
-        "current_weight": round(weights[-1], 1),
-        "start_weight": round(weights[0], 1),
-        "change": change,
-        "trend": trend,
+        "average_weight": float(weights.mean()),
+        "weight_change": change,
+        "weight_change_percentage": pct,
+        "current_weight": current,
+        "trend": "down" if change < 0 else "up" if change > 0 else "stable",
     }
 
 
@@ -363,16 +394,21 @@ def get_weight_stats(days: int = 30) -> dict:
 # GOALS
 # =====================================================
 
+
 def save_goal(goal: Goal) -> Goal:
     ensure_data_directory()
 
-    df = pd.DataFrame([{
-        "goal_type": goal.goal_type,
-        "target_weight_kg": goal.target_weight_kg,
-        "target_workout_minutes": goal.target_workout_minutes,
-        "target_calories": goal.target_calories,
-        "notes": goal.notes,
-    }])
+    df = pd.DataFrame(
+        [
+            {
+                "goal_type": goal.goal_type,
+                "target_weight_kg": goal.target_weight_kg,
+                "target_workout_minutes": goal.target_workout_minutes,
+                "target_calories": goal.target_calories,
+                "notes": goal.notes,
+            }
+        ]
+    )
 
     df.to_csv(GOALS_FILE, index=False)
     return goal
@@ -388,8 +424,14 @@ def get_goal() -> Optional[Goal]:
 
     return Goal(
         goal_type=str(row["goal_type"]),
-        target_weight_kg=float(row["target_weight_kg"]) if pd.notna(row["target_weight_kg"]) else None,
+        target_weight_kg=(
+            float(row["target_weight_kg"])
+            if pd.notna(row["target_weight_kg"])
+            else None
+        ),
         target_workout_minutes=int(row["target_workout_minutes"]),
-        target_calories=int(row["target_calories"]) if pd.notna(row["target_calories"]) else None,
+        target_calories=(
+            int(row["target_calories"]) if pd.notna(row["target_calories"]) else None
+        ),
         notes=str(row["notes"]) if pd.notna(row["notes"]) else None,
     )

@@ -64,9 +64,9 @@ def list_weight_entries(
 
     return [
         WeightOut(
-            date=row["date"],
-            weight_kg=row["weight"],
             id=str(row["id"]),
+            date=row["date"],
+            weight_kg=float(row["weight_kg"]),  # FIXED
         )
         for _, row in df.iterrows()
     ]

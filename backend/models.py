@@ -1,75 +1,49 @@
-"""Data models for workout, nutrition, weight, and goal tracking."""
-
-from dataclasses import dataclass
-from datetime import date as Date
+from dataclasses import dataclass, field
+from datetime import date
 from typing import Optional
+
+from backend.services.data_service import _generate_id
 
 
 @dataclass
 class Workout:
-    """Represents a workout session."""
-
-    id: int
-    date: Date
+    date: date
     type: str
     duration_minutes: int
     calories_burned: Optional[int] = None
     notes: Optional[str] = None
+    id: str = field(default_factory=_generate_id)
 
     def __post_init__(self) -> None:
-        """Validate workout values."""
         if self.duration_minutes <= 0:
-            raise ValueError("Duration must be a positive integer.")
-
-        if self.calories_burned is not None and self.calories_burned < 0:
-            raise ValueError("Calories burned must be a non-negative integer.")
+            raise ValueError("Duration must be positive")
 
 
 @dataclass
 class Nutrition:
-    """Represents nutritional information for a meal."""
-
-    date: Date
-    meal_name: str
-    calories: int
+    date: date
+    meal_name: str = ""
+    calories: int = 0
     carbs: Optional[int] = None
     protein: Optional[int] = None
     fat: Optional[int] = None
-
-    def __post_init__(self) -> None:
-        """Validate nutrition values."""
-        if self.calories < 0:
-            raise ValueError("Calories must be a non-negative integer.")
-
-        if self.carbs is not None and self.carbs < 0:
-            raise ValueError("Carbs must be a non-negative integer.")
-
-        if self.protein is not None and self.protein < 0:
-            raise ValueError("Protein must be a non-negative integer.")
-
-        if self.fat is not None and self.fat < 0:
-            raise ValueError("Fat must be a non-negative integer.")
+    id: str = field(default_factory=_generate_id)
 
 
 @dataclass
 class Weight:
-    """Represents a weight entry."""
-
-    date: Date
-    weight_kg: float
-
-    def __post_init__(self) -> None:
-        """Validate weight value."""
-        if self.weight_kg <= 0:
-            raise ValueError("Weight must be a positive number.")
+    date: date
+    weight_kg: float = 0.0
+    id: str = field(default_factory=_generate_id)
 
 
 @dataclass
 class Goal:
-    """Represents a user fitness goal."""
-
-    goal_type: str
+    goal_type: str = ""
     target_weight_kg: Optional[float] = None
     target_workout_minutes: Optional[int] = None
     target_calories: Optional[int] = None
     notes: Optional[str] = None
+    weekly_workouts: int = 0
+    daily_calorie_target: Optional[int] = None
+    id: str = field(default_factory=_generate_id)

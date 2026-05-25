@@ -3,11 +3,10 @@ Endpoints for nutrition.
 """
 
 from datetime import date
-from typing import Optional
+from typing import Optional, Any, Union
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-
 
 from backend.models import Nutrition
 from backend.services import data_service as ds
@@ -19,7 +18,7 @@ class NutritionIn(BaseModel):
     """Input model for nutrition entries."""
 
     date: date
-    meal_name: str = Field(..., min_length=1, example="Breakfast")
+    meal_name: str = Field(..., min_length=1)
     calories: int = Field(..., ge=0)
     carbs: Optional[int] = Field(None, ge=0)
     protein: Optional[int] = Field(None, ge=0)
@@ -42,21 +41,36 @@ class DailyCaloriesOut(BaseModel):
 @router.post("/", response_model=NutritionOut, status_code=201)
 def create_nutrition_entry(nutrition: NutritionIn) -> NutritionOut:
     """Create a new nutrition entry."""
-
     try:
         entry = Nutrition(**nutrition.model_dump())
         saved = ds.save_nutrition(entry)
 
-        return NutritionOut(
-            **nutrition.model_dump(),
-            id=saved.id,
-        )
+        return NutritionOut(**nutrition.model_dump(), id=saved.id)
 
     except ValueError as error:
-        raise HTTPException(
-            status_code=400,
-            detail=str(error),
-        ) from error
+        raise HTTPException(status_code=400, detail=str(error)) from error
+
+
+def _safe_float(value: Any) -> Optional[float]:
+    """
+    Safely convert pandas/numpy values to float.
+    Handles NaN, None, strings, and invalid values.
+    """
+    try:
+        if value is None:
+            return None
+
+        # handle pandas NaN / numpy NaN
+        if str(value).lower() == "nan":
+            return None
+
+        parsed = float(value)
+
+        # optionally reject negative values if you want clean nutrition data
+        return parsed if parsed >= 0 else None
+
+    except (TypeError, ValueError):
+        return None
 
 
 @router.get("/", response_model=list[NutritionOut])
@@ -66,27 +80,17 @@ def list_nutrition_entries(
 ) -> list[NutritionOut]:
     """List nutrition entries, optionally filtered by date range."""
 
-    df = ds.get_nutrition(
-        from_date=from_date,
-        to_date=to_date,
-    )
+    df = ds.get_nutrition(from_date=from_date, to_date=to_date)
 
     if df.empty:
         return []
 
-    def _safe_float(value: object) -> Optional[float]:
-        try:
-            parsed = float(value)
-            return parsed if parsed >= 0 else None
-        except (TypeError, ValueError):
-            return None
-
     return [
         NutritionOut(
-            id=row["id"],
+            id=str(row["id"]),
             date=row["date"],
-            meal_name=row["meal_name"],
-            calories=row["calories"],
+            meal_name=str(row["meal_name"]),
+            calories=int(row["calories"]),
             carbs=_safe_float(row["carbs"]),
             protein=_safe_float(row["protein"]),
             fat=_safe_float(row["fat"]),
@@ -103,5 +107,5 @@ def get_daily_calories(target_date: date) -> DailyCaloriesOut:
 
     return DailyCaloriesOut(
         date=target_date,
-        total_calories=total,
+        total_calories=int(total),
     )
