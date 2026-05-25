@@ -57,6 +57,7 @@ WEIGHT_SCHEMA = [
 ]
 
 GOALS_SCHEMA = [
+    "id",
     "goal_type",
     "target_weight_kg",
     "target_workout_minutes",
@@ -79,7 +80,7 @@ def ensure_data_directory() -> None:
         (WEIGHT_FILE, WEIGHT_SCHEMA),
         (GOALS_FILE, GOALS_SCHEMA),
     ]:
-        if not file.exists():
+        if (not file.exists()) or file.stat().st_size == 0:
             pd.DataFrame(columns=cols).to_csv(file, index=False)
 
 
@@ -89,12 +90,16 @@ def _generate_id() -> str:
 
 def _load_csv(filepath: Path, cols: list[str]) -> pd.DataFrame:
     ensure_data_directory()
-    df = pd.read_csv(filepath)
 
-    if df.empty:
+    if not filepath.exists() or filepath.stat().st_size == 0:
         return pd.DataFrame(columns=cols)
 
-    return df
+    try:
+        df = pd.read_csv(filepath)
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame(columns=cols)
+
+    return df if not df.empty else pd.DataFrame(columns=cols)
 
 
 def _filter_by_date(
@@ -287,17 +292,11 @@ def delete_weight(weight_id: str) -> bool:
     return True
 
 
-def get_weight_trend(
-    from_date: Optional[date] = None,
-    to_date: Optional[date] = None,
-) -> pd.DataFrame:
+def get_weight_trend(from_date=None, to_date=None):
     df = _load_csv(WEIGHT_FILE, WEIGHT_SCHEMA)
+    df = _filter_by_date(df, from_date, to_date)
 
-    return (
-        _filter_by_date(df, from_date, to_date)
-        .sort_values("date")
-        .reset_index(drop=True)
-    )
+    return df.iloc[::-1].reset_index(drop=True)
 
 
 # =====================================================
@@ -396,19 +395,16 @@ def get_weight_stats(days: int = 30) -> dict:
 
 
 def save_goal(goal: Goal) -> Goal:
-    ensure_data_directory()
+    goal.id = _generate_id()
 
-    df = pd.DataFrame(
-        [
-            {
-                "goal_type": goal.goal_type,
-                "target_weight_kg": goal.target_weight_kg,
-                "target_workout_minutes": goal.target_workout_minutes,
-                "target_calories": goal.target_calories,
-                "notes": goal.notes,
-            }
-        ]
-    )
+    df = pd.DataFrame([{
+        "id": goal.id,
+        "goal_type": goal.goal_type,
+        "target_weight_kg": goal.target_weight_kg,
+        "target_workout_minutes": goal.target_workout_minutes,
+        "target_calories": goal.target_calories,
+        "notes": goal.notes,
+    }])
 
     df.to_csv(GOALS_FILE, index=False)
     return goal
