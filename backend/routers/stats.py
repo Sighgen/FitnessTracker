@@ -32,8 +32,9 @@ class WeightStatsOut(BaseModel):
     """Output model for weight statistics."""
 
     current_weight: Optional[float]
-    start_weight: Optional[float]
-    change: float
+    average_weight: float
+    weight_change: Optional[float]
+    weight_change_percentage: Optional[float]
     trend: str
 
 

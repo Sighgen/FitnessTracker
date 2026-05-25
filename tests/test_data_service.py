@@ -181,3 +181,40 @@ def test_weight_stats_downward_trend():
     stats = ds.get_weight_stats()
     assert stats["trend"] == "down"
     assert stats["current_weight"] == pytest.approx(81.0)
+
+
+# =====================================================
+# GOALS TESTS
+# =====================================================
+
+def test_save_and_get_goal():
+    from backend.models import Goal
+    ds.save_goal(Goal(goal_type="weight_loss", target_weight_kg=75.0, weekly_workouts=4))
+
+    loaded = ds.get_goal()
+    assert loaded is not None
+    assert loaded.goal_type == "weight_loss"
+    assert loaded.target_weight_kg == pytest.approx(75.0)
+    assert loaded.weekly_workouts == 4
+
+
+def test_goal_overwrites_existing():
+    from backend.models import Goal
+    ds.save_goal(Goal(goal_type="weight_loss", weekly_workouts=3))
+    ds.save_goal(Goal(goal_type="muscle_gain", weekly_workouts=5))
+
+    loaded = ds.get_goal()
+    assert loaded.goal_type == "muscle_gain"
+    assert loaded.weekly_workouts == 5
+
+
+def test_no_goal_returns_none():
+    assert ds.get_goal() is None
+
+
+def test_daily_calorie_target_persists():
+    from backend.models import Goal
+    ds.save_goal(Goal(goal_type="weight_loss", weekly_workouts=3, daily_calorie_target=2000))
+
+    loaded = ds.get_goal()
+    assert loaded.daily_calorie_target == 2000

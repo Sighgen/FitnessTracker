@@ -42,5 +42,7 @@ class Goal:
     target_weight_kg: Optional[float] = None
     target_workout_minutes: Optional[int] = None
     target_calories: Optional[int] = None
+    weekly_workouts: int = 3
+    daily_calorie_target: Optional[int] = None
     notes: Optional[str] = None
     id: Optional[str] = None
