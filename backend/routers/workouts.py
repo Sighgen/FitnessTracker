@@ -18,7 +18,7 @@ class WorkoutIn(BaseModel):
     """Input model for workouts."""
 
     date: date
-    workout_type: str = Field(..., min_length=1, example="Running")
+    workout_type: str = Field(..., min_length=1, json_schema_extra={"example": "Running"})
     duration_minutes: int = Field(..., gt=0)
     calories_burned: Optional[int] = Field(None, ge=0)
     notes: Optional[str] = None
@@ -56,7 +56,9 @@ def create_workout(workout: WorkoutIn) -> WorkoutOut:
     """Create a new workout entry."""
 
     try:
-        entry = Workout(**workout.model_dump())
+        data = workout.model_dump()
+        data["type"] = data.pop("workout_type")  # map API field -> model field
+        entry = Workout(**data)
         saved = ds.save_workout(entry)
 
         return WorkoutOut(
