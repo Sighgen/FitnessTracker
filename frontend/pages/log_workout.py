@@ -30,7 +30,7 @@ with st.form("workout_form", clear_on_submit=True):
         workout_type = st.selectbox("Workout Type", EXERCISE_TYPES)
 
     with col2:
-        duration = st.number_input("Duration (minutes)", min_value=1, max_value=1440, value=45, step 5)
+        duration = st.number_input("Duration (minutes)", min_value=1, max_value=1440, value=45, step=5)
         calories = st.number_input("Calories Burned", min_value=0, max_value=10000, value=0, step=10)
 
     notes = st.text_area("Notes (optional)", placeholder="E.g. Felt great, need to improve form, etc.")
@@ -42,7 +42,7 @@ if submitted:
             workout_date=workout_date,
             workout_type=workout_type,
             duration_minutes=duration,
-            calories_burned=calories, if calories > 0 else None,
+            calories_burned=calories if calories > 0 else None,
             notes=notes if notes else None,
         )
         st.success(f"{workout_type} ({duration} min) logged successfully!")
