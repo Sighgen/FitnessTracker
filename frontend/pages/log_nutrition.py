@@ -65,3 +65,46 @@ if submitted:
         st.error(f"Error logging meal: {e}")
 
 st.divider()
+
+#======================================================
+# NUTRITION HISTORY
+#======================================================
+
+st.subheader("Nutrition History")
+
+col_f1, col_f2 = st.columns(2)
+with col_f1:
+    filter_from = st.date_input("From date", value=date.today().replace(day=1))
+with col_f2:
+    filter_to = st.date_input("To date", value=date.today())
+
+try:
+    entries = get_nutrition(from_date=filter_from, to_date=filter_to)
+except Exception as e:
+    st.error(f"Error fetching nutrition entries: {e}")
+    st.stop()
+
+if not entries:
+    st.info("No nutrition entries logged in this period.")
+else:
+    df = pd.DataFrame(entries)
+    df["date"] = pd.to_datetime(df["date"]).dt.strftime("%Y-%m-%d")
+    df = df.rename(columns={
+        "date": "Date",
+        "meal_name": "Meal",
+        "calories": "Calories (kcal)",
+        "protein": "Protein (g)",
+        "carbs": "Carbs (g)",
+        "fats": "Fats (g)",
+    })
+    display_cols = ["Date", "Meal", "Calories (kcal)", "Protein (g)", "Carbs (g)", "Fats (g)"]
+    st.dataframe(df[display_cols], use_container_width=True, hide_index=True)
+
+    # Daily totals
+    st.subheader("Daily Totals")
+    df_raw = pd.DataFrame(entries)
+    df_raw["date"] = pd.to_datetime(df_raw["date"]).dt.date
+    daily = df_raw.groupby("date")["calories"].sum().reset_index()
+    daily.columns = ["Date", "Total Calories (kcal)"]
+    daily["Date"] = daily["Date"].astype(str)
+    st.dataframe(daily, use_container_width=True, hide_index=True)
