@@ -35,3 +35,26 @@ col2.metric(
 col3.metric("Trend", stats["trend", "-"])
 
 st.divider()
+
+#======================================================
+# FORM
+#======================================================
+
+with st.form("weight_form", clear_on_submit=True):
+    st.subheader("Log a new weight entry")
+    col_a, col_b = st.columns(2)
+    with col_a:
+        weight_date = st.date_input("Date", value=date.today(), max_value=date.today())
+    with col_b:
+        weight_kg = st.number_input("Weight (kg)", min_value=0.0, max_value=500.0, value=70.0, step=0.1, format="%.1f")
+
+    submitted = st.form_submit_button("Log Weight", type="primary", use_container_width=True)
+
+if submitted:
+    try:
+        create_weight(weight_date=weight_date, weight_kg=weight_kg)
+        st.success(f"Weight {weight_kg} kg logged {weight_date.strftime('%Y-%m-%d')}!")
+    except Exception as e:
+        st.error(f"Error logging weight: {e}")
+
+st.divider()
