@@ -116,3 +116,16 @@ def get_weight(from_date: Optional[date] = None, to_date: Optional[date] = None)
 def create_weight(weight_date: date, weight_kg: float) -> dict:
     return _post("/weight/", {"date": str(weight_date), "weight_kg": weight_kg})
 
+
+# =====================================================
+# STATS
+# =====================================================
+
+def get_workout_stats(days: int = 30) -> dict:
+    """Fetch workout stats for the past N days."""
+    return _get("/stats/workout/", params={"days": days})
+
+
+def get_weight_stats(days: int = 30) -> dict:
+    """Fetch weight stats for the past N days."""
+    return _get("/stats/weight/", params={"days": days})
