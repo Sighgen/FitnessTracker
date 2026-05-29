@@ -62,6 +62,8 @@ GOALS_SCHEMA = [
     "target_weight_kg",
     "target_workout_minutes",
     "target_calories",
+    "weekly_workouts",
+    "daily_calorie_target",
     "notes",
 ]
 
@@ -403,6 +405,8 @@ def save_goal(goal: Goal) -> Goal:
         "target_weight_kg": goal.target_weight_kg,
         "target_workout_minutes": goal.target_workout_minutes,
         "target_calories": goal.target_calories,
+        "weekly_workouts": goal.weekly_workouts,
+        "daily_calorie_target": goal.daily_calorie_target,
         "notes": goal.notes,
     }])
 
@@ -425,9 +429,11 @@ def get_goal() -> Optional[Goal]:
             if pd.notna(row["target_weight_kg"])
             else None
         ),
-        target_workout_minutes=int(row["target_workout_minutes"]),
+        target_workout_minutes=int(row["target_workout_minutes"]) if pd.notna(row["target_workout_minutes"]) else None,
         target_calories=(
             int(row["target_calories"]) if pd.notna(row["target_calories"]) else None
         ),
+        weekly_workouts=int(row["weekly_workouts"]) if pd.notna(row["weekly_workouts"]) else 3,
+        daily_calorie_target=int(row["daily_calorie_target"]) if pd.notna(row["daily_calorie_target"]) else None,
         notes=str(row["notes"]) if pd.notna(row["notes"]) else None,
     )
