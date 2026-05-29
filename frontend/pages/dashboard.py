@@ -169,4 +169,31 @@ with col3:
         plt.close(fig)
     else:
         st.info("No nutrition data available.")
-        
+
+
+# Training type
+
+with col4:
+    st.subheader("Workout types")
+    workout_data = workout_data if "workout_data" in dir () else get_workouts(from_date=from_date)
+
+    if workout_data:
+        df = pd.DataFrame(workout_data)
+        type_counts = df["workout_type"].value_counts()
+
+        fig, ax = plt.subplots(figsize=(6, 3.5))
+        wedges, texts, autotexts = ax.pie(
+            type_counts.values,
+            labels=type_counts.index,
+            autopct="%1.1f%%",
+            colors=["#4f8ef7", "#34c88a", "#f7874f", "#f7c84f", "#9b59b6"],
+            startangle=90,
+        )
+        for text in autotexts:
+            text.set_fontsize(9)
+        ax.set_title("")
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close(fig)
+    else:
+        st.info("No workout data available.")
