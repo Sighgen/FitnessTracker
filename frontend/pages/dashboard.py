@@ -142,3 +142,31 @@ with col2:
     
 st.divider()
 col3, col4 = st.columns(2)
+
+
+# Calories over time
+with col3:
+    st.subheader("Calorie intake")
+    nutrition_data = get_nutrition(from_date=from_date)
+
+    if nutrition_data:
+        df = pd.DataFrame(nutrition_data)
+        df["date"] = pd.to_datetime(df["date"]).dt.date
+        daily = df.groupby("date")["calories"].sum().reset_index()
+        daily["date"] = pd.to_datetime(daily["date"])
+
+        fig, ax = plt.subplots(figsize=(6, 3.5))
+        ax.bar(daily["date"], daily["calories"], color="#f7874f", alpha=0.85, width=0.8)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+        fig.autofmt_xdate()
+        ax.set_ylabel("Calories (kcal)")
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.grid(axis="y", alpha=0.3)
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close(fig)
+    else:
+        st.info("No nutrition data available.")
+        
