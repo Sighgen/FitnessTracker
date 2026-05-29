@@ -129,3 +129,35 @@ def get_workout_stats(days: int = 30) -> dict:
 def get_weight_stats(days: int = 30) -> dict:
     """Fetch weight stats for the past N days."""
     return _get("/stats/weight/", params={"days": days})
+
+
+# =====================================================
+# GOALS
+# =====================================================
+
+
+def get_goal() -> Optional[dict]:
+    """Fetch user's fitness goal."""
+    try:
+        return _get("/goals")
+    except requests.HTTPError as e:
+        if e.response.status_code == 404:
+            return None
+        raise
+
+
+def save_goal(
+        goal_type: str,
+        weekly_workouts: int,
+        target_weight_kg: Optional[float] = None,
+        daily_calorie_target: Optional[int] = None,
+        note: Optional[str] = None,
+) -> dict:
+    """Save user's fitness goal."""
+    return _post("/goals", {
+        "goal_type": goal_type,
+        "weekly_workouts": weekly_workouts,
+        "target_weight_kg": target_weight_kg,
+        "daily_calorie_target": daily_calorie_target,
+        "note": note,
+    })
