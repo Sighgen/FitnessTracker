@@ -80,6 +80,8 @@ Keep the plan realistic and achievable."""
         max_tokens=600,
     )
 
+    return response.choices[0].message.content
+
 
 def generate_nutrition_advice(
         goal: Optional[Goal],
