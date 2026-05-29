@@ -98,3 +98,21 @@ def get_daily_calories(target_date: date) -> int:
     """Fetch total calories consumed for a specific date."""
     data = _get(f"/nutrition/daily/{target_date}")
     return data.get("total_calories")
+
+
+# =====================================================
+# WEIGHT
+# =====================================================
+
+def get_weight(from_date: Optional[date] = None, to_date: Optional[date] = None) -> list[dict]:
+    """Fetch weight entries from backend, optionally filtered by date range."""
+    params = {}
+    if from_date:
+        params["from_date"] = str(from_date)
+    if to_date:
+        params["to_date"] = str(to_date)
+    return _get("/weight/", params=params)
+
+def create_weight(weight_date: date, weight_kg: float) -> dict:
+    return _post("/weight/", {"date": str(weight_date), "weight_kg": weight_kg})
+
