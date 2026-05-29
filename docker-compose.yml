@@ -1,0 +1,40 @@
+services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: fittracker-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist CSV data between container restarts
+      - fittracker-data:/app/backend/data
+    environment:
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: fittracker-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      # Fortæl Streamlit hvor backend kører (inde i Docker-netværket)
+      - API_BASE_URL=http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  fittracker-data:
+    name: fittracker-data

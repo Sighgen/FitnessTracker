@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Tests, typecheck & linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r backend/requirements.txt
+          pip install mypy flake8
+
+      - name: flake8 — kodeanalyse
+        run: |
+          flake8 backend/ \
+            --max-line-length=100 \
+            --exclude=__pycache__ \
+            --extend-ignore=E501
+
+      - name: mypy — type checks
+        run: |
+          mypy backend/ \
+            --ignore-missing-imports \
+            --exclude '__pycache__'
+
+      - name: pytest — unit tests
+        run: |
+          pytest tests/test_data_service.py -v
+
+      - name: pytest — API tests
+        run: |
+          pytest tests/test_api.py -v
