@@ -35,4 +35,30 @@ def _delete(path: str) -> None:
     # WORKOUTS
     # =====================================================
 
+    def get_workouts(from_date: Optional[date] = None, to_date: Optional[date] = None) -> list[dict]:
+        """Fetch workouts from backend, optionally filtered by date range."""
+        params = {}
+        if from_date:
+            params["from_date"] = str(from_date)
+        if to_date:
+            params["to_date"] = str(to_date)
+        return _get("/workouts/", params=params)
     
+
+    def create_workout(
+            workout_date: date,
+            workout_type: str,
+            duration_minutes: int,
+            calories_burned: Optional[int] = None,
+            notes: Optional[str] = None,
+    ) -> dict:
+        return _post("/workouts/", {
+            "date": str(workout_date),
+            "workout_type": workout_type,
+            "duration_minutes": duration_minutes,
+            "calories_burned": calories_burned,
+            "notes": notes,
+        })
+    
+    def delete_workout(workout_id: int) -> None:
+        _delete(f"/workouts/{workout_id}")
