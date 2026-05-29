@@ -62,3 +62,39 @@ def _delete(path: str) -> None:
     
     def delete_workout(workout_id: int) -> None:
         _delete(f"/workouts/{workout_id}")
+
+
+# =====================================================
+# NUTRITION
+# =====================================================
+
+def get_nutrition(from_date: Optional[date] = None, to_date: Optional[date] = None) -> list[dict]:
+    """Fetch nutrition entries from backend, optionally filtered by date range."""
+    params = {}
+    if from_date:
+        params["from_date"] = str(from_date)
+    if to_date:
+        params["to_date"] = str(to_date)
+    return _get("/nutrition/", params=params)
+
+def create_nutrition(
+        nutrition_date: date,
+        meal_name: str,
+        calories: int,
+        protein: Optional[float] = None,
+        carbs: Optional[float] = None,
+        fats: Optional[float] = None,
+) -> dict:
+    return _post("/nutrition/", {
+        "date": str(nutrition_date),
+        "meal_name": meal_name,
+        "calories": calories,
+        "protein": protein,
+        "carbs": carbs,
+        "fats": fats,
+    })
+
+def get_daily_calories(target_date: date) -> int:
+    """Fetch total calories consumed for a specific date."""
+    data = _get(f"/nutrition/daily/{target_date}")
+    return data.get("total_calories")
