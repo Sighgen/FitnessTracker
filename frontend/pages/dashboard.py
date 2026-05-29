@@ -72,3 +72,39 @@ k4.metric(
 )
 
 st.divider()
+
+#======================================================
+# GRAPHS
+#======================================================
+
+col1, col2 = st.columns(2)
+
+# Weight graph
+
+with col1:
+    st.subheader("Weight Over Time")
+    weight_data = get_weight(from_date=from_date)
+    
+    if weight_data:
+        df = pd.DataFrame(weight_data)
+        df["date"] = pd.to_datetime(df["date"])
+        df = df.sort_values("date")
+
+        fig, ax = plt.subplots(figsize=(6, 3.5))
+        ax.plot(df["date"], df["weight_kg"], marker="o", linewidth=2,
+                color="#4f8ef7", markersize=5)
+        ax.fill_between(df["date"], df["weight_kg"], 
+                        df["weight_kg"].min(), - 0.5, alpha=0.1, color="#4f8ef7")
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+        fig.autofmt_xdate()
+        ax.set_ylabel("Weight (kg)")
+        ax.set_xlabel("")
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.grid(axis="y", alpha=0.3)
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close(fig)
+    else:
+        st.info("No weight data available.")
