@@ -9,7 +9,7 @@ Set with .env file, later via Docker Compose.
 import os
 from typing import Optional
 
-from mistralai.client import Mistral
+from mistralai import Mistral
 
 from backend.models import Goal
 

@@ -22,7 +22,7 @@ MEAL_TYPES = ["Breakfast", "Lunch", "Dinner", "Snack"]
 #======================================================
 
 try:
-    calories = get_daily_calories(date.today())
+    today_calories = get_daily_calories(date.today()) or 0
 except Exception:
     today_calories = 0
 
@@ -39,8 +39,8 @@ with st.form("nutrition_form", clear_on_submit=True):
 
     with col1:
         nutrition_date = st.date_input("Date", value=date.today(), max_value=date.today())
-        meal_name = st.text_selectbox("Meal Type", MEAL_TYPES)
-        calories = st.number_input("Calories (kcal)", min_value=0, max_value=10000, value=500, step=10)
+        meal_name = st.selectbox("Meal Type", MEAL_TYPES)
+        calories_input = st.number_input("Calories (kcal)", min_value=0, max_value=10000, value=500, step=10)
 
     with col2:
         protein = st.number_input("Protein (g)", min_value=0, max_value=1000, value=25, step=1)
@@ -54,12 +54,12 @@ if submitted:
         create_nutrition(
             nutrition_date=nutrition_date,
             meal_name=meal_name,
-            calories=calories,
+            calories=calories_input,
             protein=protein if protein > 0 else None,
             carbs=carbs if carbs > 0 else None,
             fats=fats if fats > 0 else None,
         )
-        st.success(f"{meal_name} ({calories} kcal) logged successfully!")
+        st.success(f"{meal_name} ({calories_input} kcal) logged successfully!")
         st.rerun()
     except Exception as e:
         st.error(f"Error logging meal: {e}")
@@ -89,6 +89,7 @@ if not entries:
 else:
     df = pd.DataFrame(entries)
     df["date"] = pd.to_datetime(df["date"]).dt.strftime("%Y-%m-%d")
+
     df = df.rename(columns={
         "date": "Date",
         "meal_name": "Meal",
@@ -97,14 +98,21 @@ else:
         "carbs": "Carbs (g)",
         "fats": "Fats (g)",
     })
+
     display_cols = ["Date", "Meal", "Calories (kcal)", "Protein (g)", "Carbs (g)", "Fats (g)"]
     st.dataframe(df[display_cols], use_container_width=True, hide_index=True)
 
-    # Daily totals
+    #======================================================
+    # DAILY TOTALS
+    #======================================================
+
     st.subheader("Daily Totals")
+
     df_raw = pd.DataFrame(entries)
     df_raw["date"] = pd.to_datetime(df_raw["date"]).dt.date
+
     daily = df_raw.groupby("date")["calories"].sum().reset_index()
     daily.columns = ["Date", "Total Calories (kcal)"]
     daily["Date"] = daily["Date"].astype(str)
+
     st.dataframe(daily, use_container_width=True, hide_index=True)

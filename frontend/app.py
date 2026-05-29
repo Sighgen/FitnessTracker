@@ -32,9 +32,12 @@ st.markdown(
     """)
 
 # Check backend
+import os
 import requests
+
+BASE_URL = os.environ.get("API_BASE_URL", "http://localhost:8000")
 try:
-    r = requests.get("http://localhost:8000/health", timeout=3)
+    r = requests.get(f"{BASE_URL}/health", timeout=3)
     if r.status_code == 200:
         st.success("Backend is healthy and running!")
     else:
