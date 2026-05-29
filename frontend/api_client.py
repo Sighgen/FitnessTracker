@@ -161,3 +161,21 @@ def save_goal(
         "daily_calorie_target": daily_calorie_target,
         "note": note,
     })
+
+
+# =====================================================
+# AI
+# =====================================================
+
+def get_ai_workout_plan() -> str:
+    """Fetch AI-generated workout plan."""
+    return _get("/ai/workout-plan")["response"]
+
+
+def get_ai_nutrition_advice() -> str:
+    """Fetch AI-generated nutrition advice."""
+    return _get("/ai/nutrition-advice")["response"]
+
+def get_ai_motivation() -> str:
+    """Fetch AI-generated motivation."""
+    return _get("/ai/motivation")["response"]
