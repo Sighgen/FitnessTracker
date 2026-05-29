@@ -51,3 +51,50 @@ if submitted:
 
 st.divider()
 
+#======================================================
+# WORKOUT HISTORY
+#======================================================
+
+st.subheader("Workout History")
+
+col_f1, col_f2 = st.columns(2)
+with col_f1:
+    filter_from = st.date_input("From date", value=date.today().replace(day=1))
+with col_f2:
+    filter_to = st.date_input("To date", value=date.today())
+
+try:
+    workouts = get_workouts(from_date=filter_from, to_date=filter_to)
+except Exception as e:
+    st.error(f"Error fetching workouts: {e}")
+    st.stop()
+
+if not workouts:
+    st.info("No workouts logged in this period.")
+else:
+    df = pd.DataFrame(workouts)
+    df = df.rename(columns={
+        "date": "Date",
+        "workout_type": "Type",
+        "duration_minutes": "Minutes",
+        "calories_burned": "Calories",
+        "notes": "Notes",
+    })
+    df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
+
+    # Show table
+    display_cols = ["Date", "Type", "Minutes", "Calories", "Notes"]
+    st.dataframe(df[display_cols], use_container_width=True, hide_index=True)
+
+    # Delete
+    st.subheader("Delete a workout")
+    options = {f"{w['date']} — {w['workout_type']} ({w['duration_minutes']} min)": w["id"] for w in workouts}
+    selected_label = st.selectbox("Select workout to delete", list(options.keys()))
+
+    if st.button("Delete Workout", type="secondary"):
+        try:
+            delete_workout(workout_id=options[selected_label])
+            st.success("Workout deleted successfully!")
+            st.rerun()
+        except Exception as e:
+            st.error(f"Error deleting workout: {e}")
