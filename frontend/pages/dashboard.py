@@ -108,3 +108,37 @@ with col1:
         plt.close(fig)
     else:
         st.info("No weight data available.")
+
+# Workout graph
+with col2:
+    st.subheader("Workout sessions")
+    workout_data = get_workouts(from_date=from_date)
+
+    if workout_data:
+        df = pd.DataFrame(workout_data)
+        df["date"] = pd.to_datetime(df["date"])
+        
+
+        # Group per week
+        df["week"] = df["date"].dt.to_period("W").apply(lambda p: p.start_time)
+        weekly = df.groupby("week").size().reset_index(name="count")
+
+        fig, ax = plt.subplots(figsize=(6, 3.5))
+        ax.bar(weekly["week"], weekly["count"], color="#34c88a", width=5, alpha=0.85)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+        fig.autofmt_xdate()
+        ax.set_ylabel("Number of workouts")
+        ax.set_xlabel("Week start date")
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.grid(axis="y", alpha=0.3)
+        ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+        plt.tight_layout()
+        st.pyplot(fig)
+        plt.close(fig)
+    else:
+        st.info("No workout data available.")
+    
+st.divider()
+col3, col4 = st.columns(2)
