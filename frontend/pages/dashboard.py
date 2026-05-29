@@ -20,3 +20,18 @@ from api_client import (
     get_nutrition,
     get_daily_calories,
 )
+
+st.set_page_config(page_title="Dashboard", layout="wide")
+st.title("📊 Fitness Dashboard")
+
+#======================================================
+# DATE
+#======================================================
+
+col_l, col_r = st.columns([2, 1])
+with col_r:
+    days_options = {"Last 7 days": 7, "Last 30 days": 30, "Last 90 days": 90}
+    selected = st.selectbox("Select time range", list(days_options.keys()), index=1)
+    days = days_options[selected]
+
+from_date = date.today() - timedelta(days=days)
