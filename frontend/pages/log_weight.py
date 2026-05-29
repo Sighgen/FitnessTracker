@@ -79,7 +79,9 @@ else:
     df = df.sort_values("date")
 
     fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(df["date"], df["weight_kg"], marker="o", linewidth=2.5, color="#4f8ef7", markersize=6 label="Weight (kg)")
+    ax.plot(df["date"], df["weight_kg"], marker="o", linewidth=2.5,
+            color="#4f8ef7", markersize=6, label="Vægt")
+
 
     # Trend
     if len(df) >= 5:
