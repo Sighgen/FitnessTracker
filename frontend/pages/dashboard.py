@@ -54,21 +54,21 @@ k1, k2, k3, k4 = st.columns(4)
 k1.metric(
     "Workouts",
     workout_stats["total_workouts"],
-    help=f"Latest {days} days"
+    help=f"Latest {days} days",
 )
 k2.metric(
-    "Total Workout duration",
-    f"{workout_stats['total_duration_minutes']} min",
-    help=f"Latest {days} days"
+    "Total Workout Duration",
+    f"{workout_stats['total_duration']} min",       # fix: total_duration_minutes → total_duration
+    help=f"Latest {days} days",
 )
 k3.metric(
     "Current Weight",
-    f"{weight_stats['current_weight_kg']} kg" if weight_stats["current_weight"] else "-",
-    delta=f"{weight_stats['weight_change']:+.1f} kg" if weight_stats["weight_change"] else None,
-)
+    f"{weight_stats['current_weight']} kg" if weight_stats["current_weight"] else "-",
+    delta=f"{weight_stats['weight_change']:+.1f} kg" if weight_stats.get("weight_change") else None,
+)                                                   # fix: current_weight_kg → current_weight
 k4.metric(
     "Today's Calories",
-    f"{today_calories} kcal",
+    f"{calories} kcal",                             # fix: today_calories → calories
 )
 
 st.divider()
@@ -80,11 +80,10 @@ st.divider()
 col1, col2 = st.columns(2)
 
 # Weight graph
-
 with col1:
     st.subheader("Weight Over Time")
     weight_data = get_weight(from_date=from_date)
-    
+
     if weight_data:
         df = pd.DataFrame(weight_data)
         df["date"] = pd.to_datetime(df["date"])
@@ -93,8 +92,8 @@ with col1:
         fig, ax = plt.subplots(figsize=(6, 3.5))
         ax.plot(df["date"], df["weight_kg"], marker="o", linewidth=2,
                 color="#4f8ef7", markersize=5)
-        ax.fill_between(df["date"], df["weight_kg"], 
-                        df["weight_kg"].min(), - 0.5, alpha=0.1, color="#4f8ef7")
+        ax.fill_between(df["date"], df["weight_kg"],
+                        df["weight_kg"].min() - 0.5, alpha=0.1, color="#4f8ef7")  # fix: syntaksfejl
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
         ax.xaxis.set_major_locator(mdates.AutoDateLocator())
         fig.autofmt_xdate()
@@ -117,7 +116,6 @@ with col2:
     if workout_data:
         df = pd.DataFrame(workout_data)
         df["date"] = pd.to_datetime(df["date"])
-        
 
         # Group per week
         df["week"] = df["date"].dt.to_period("W").apply(lambda p: p.start_time)
@@ -139,10 +137,9 @@ with col2:
         plt.close(fig)
     else:
         st.info("No workout data available.")
-    
+
 st.divider()
 col3, col4 = st.columns(2)
-
 
 # Calories over time
 with col3:
@@ -170,12 +167,10 @@ with col3:
     else:
         st.info("No nutrition data available.")
 
-
-# Training type
-
+# Workout types
 with col4:
     st.subheader("Workout types")
-    workout_data = workout_data if "workout_data" in dir () else get_workouts(from_date=from_date)
+    workout_data = workout_data if "workout_data" in dir() else get_workouts(from_date=from_date)
 
     if workout_data:
         df = pd.DataFrame(workout_data)

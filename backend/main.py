@@ -11,7 +11,7 @@ Swagger UI:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import nutrition, stats, weight, workouts
+from backend.routers import ai_router, nutrition, stats, weight, workouts
 
 app = FastAPI(
     title="Simple Fitness Tracker",
@@ -40,6 +40,7 @@ app.include_router(workouts.router)
 app.include_router(nutrition.router)
 app.include_router(weight.router)
 app.include_router(stats.router)
+app.include_router(ai_router.router)
 
 
 # -------------------------------------------------

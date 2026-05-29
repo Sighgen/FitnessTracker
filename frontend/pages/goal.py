@@ -60,7 +60,7 @@ with st.form("goal_form"):
         goal_type = st.selectbox(
             "What is your primary fitness goal?",
             options=list(GOAL_TYPES.keys()),
-            format_func=lambda x: GOAL_TYPES[k],
+            format_func=lambda x: GOAL_TYPES[x],
             index=default_goal_idx,
         )
         weekly_workouts = st.slider(

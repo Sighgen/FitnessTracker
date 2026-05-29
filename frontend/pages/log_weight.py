@@ -22,17 +22,35 @@ st.title("⚖️ Log Weight")
 #======================================================
 
 try:
-    stats = get_weight_stats()
+    stats = get_weight_stats() or {}
 except Exception:
-    stats = {"current_weight": None, "weight_change": None, "trend": "-", "average_weight": None}
+    stats = {
+        "current_weight": None,
+        "weight_change": None,
+        "trend": "-",
+        "average_weight": None,
+    }
+
+current_weight = stats.get("current_weight")
+weight_change = stats.get("weight_change")
+trend = stats.get("trend", "-")
 
 col1, col2, col3 = st.columns(3)
-col1.metric("Current Weight", f"{stats['current_weight']} kg" if stats["current_weight"] else "-")
+
+col1.metric(
+    "Current Weight",
+    f"{current_weight} kg" if current_weight is not None else "-"
+)
+
 col2.metric(
     "Change",
-    f"{stats['weight_change']:+.1f} kg" if stats["weight_change"] else "-",
+    f"{weight_change:+.1f} kg" if weight_change is not None else "-"
 )
-col3.metric("Trend", stats["trend", "-"])
+
+col3.metric(
+    "Trend",
+    trend
+)
 
 st.divider()
 
@@ -43,17 +61,35 @@ st.divider()
 with st.form("weight_form", clear_on_submit=True):
     st.subheader("Log a new weight entry")
     col_a, col_b = st.columns(2)
-    with col_a:
-        weight_date = st.date_input("Date", value=date.today(), max_value=date.today())
-    with col_b:
-        weight_kg = st.number_input("Weight (kg)", min_value=0.0, max_value=500.0, value=70.0, step=0.1, format="%.1f")
 
-    submitted = st.form_submit_button("Log Weight", type="primary", use_container_width=True)
+    with col_a:
+        weight_date = st.date_input(
+            "Date",
+            value=date.today(),
+            max_value=date.today()
+        )
+
+    with col_b:
+        weight_kg = st.number_input(
+            "Weight (kg)",
+            min_value=0.0,
+            max_value=500.0,
+            value=70.0,
+            step=0.1,
+            format="%.1f"
+        )
+
+    submitted = st.form_submit_button(
+        "Log Weight",
+        type="primary",
+        use_container_width=True
+    )
 
 if submitted:
     try:
         create_weight(weight_date=weight_date, weight_kg=weight_kg)
         st.success(f"Weight {weight_kg} kg logged {weight_date.strftime('%Y-%m-%d')}!")
+        st.rerun()
     except Exception as e:
         st.error(f"Error logging weight: {e}")
 
@@ -79,32 +115,69 @@ else:
     df = df.sort_values("date")
 
     fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(df["date"], df["weight_kg"], marker="o", linewidth=2.5,
-            color="#4f8ef7", markersize=6, label="Vægt")
 
+    ax.plot(
+        df["date"],
+        df["weight_kg"],
+        marker="o",
+        linewidth=2.5,
+        color="#4f8ef7",
+        markersize=6,
+        label="Weight"
+    )
 
-    # Trend
+    # Trend (moving average)
     if len(df) >= 5:
         df["ma"] = df["weight_kg"].rolling(window=5, center=True).mean()
-        ax.plot(df["date"], df["ma"], linewidth=1.5, linestyle="--", color="#f78c4f", alpha=0.8, label="Weighted Trend")
+
+        ax.plot(
+            df["date"],
+            df["ma"],
+            linewidth=1.5,
+            linestyle="--",
+            color="#f78c4f",
+            alpha=0.8,
+            label="Trend"
+        )
+
         ax.legend()
 
-    ax.fill_between(df["date"], df["weight_kg"], df["weight_kg"].min() - 0.5, alpha=0.8, color="#4f8ef7")
+    ax.fill_between(
+        df["date"],
+        df["weight_kg"],
+        df["weight_kg"].min() - 0.5,
+        alpha=0.2,
+        color="#4f8ef7"
+    )
+
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+
     fig.autofmt_xdate()
+
     ax.set_ylabel("Weight (kg)")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     ax.grid(axis="y", alpha=0.3)
+
     plt.tight_layout()
     st.pyplot(fig)
     plt.close()
 
-    # Table
+    #======================================================
+    # TABLE
+    #======================================================
+
     st.subheader("Weight Entries")
+
     df_display = df[["date", "weight_kg"]].copy()
     df_display["date"] = df_display["date"].dt.strftime("%Y-%m-%d")
-    df_display = df_display.rename(columns={"date": "Date", "weight_kg": "Weight (kg)"})
+
+    df_display = df_display.rename(columns={
+        "date": "Date",
+        "weight_kg": "Weight (kg)"
+    })
+
     df_display = df_display.sort_values("Date", ascending=False)
+
     st.dataframe(df_display, use_container_width=True, hide_index=True)

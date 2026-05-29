@@ -9,7 +9,7 @@ Set with .env file, later via Docker Compose.
 import os
 from typing import Optional
 
-from mistralai.client import Mistral
+from mistralai import Mistral
 
 from backend.models import Goal
 
@@ -79,6 +79,8 @@ Keep the plan realistic and achievable."""
         messages=[{"role": "user", "content": prompt}],
         max_tokens=600,
     )
+
+    return response.choices[0].message.content
 
 
 def generate_nutrition_advice(
