@@ -1,0 +1,108 @@
+id,date,type,duration_minutes,calories_burned,notes
+bfb93435-2dde-4b32-adaf-bf02b3c4f1a8,2025-12-01,Strength Training,51,311,
+9ada1b12-1614-4380-9142-1778005c0166,2025-12-02,Running,45,386,
+80a9e19e-a28a-4bc8-a7db-ef0a2b018bb1,2025-12-03,Strength Training,53,478,
+e8f42070-f9f5-4321-ac59-4ca71c6f9f2a,2025-12-05,Yoga,41,314,Tough session
+d9b43ce6-65d8-4c22-96c2-4e6d3d56870c,2025-12-07,Yoga,88,555,
+4efb8a6b-a082-48a0-96ff-a0b478979040,2025-12-09,Running,53,522,
+4d7df2af-f3d5-410a-ab57-0035865af0a7,2025-12-10,Cycling,89,869,
+d148668a-1b3f-4c5f-bd67-e81f6a6738f3,2025-12-12,Strength Training,87,814,Personal best
+8719795e-d632-427c-b5f1-24995f4c5eea,2025-12-13,Cycling,28,187,
+2ccc3a22-6a13-48ad-ab42-b2178744e450,2025-12-14,HIIT,80,497,Personal best
+d3ebf6fb-bc56-4f62-a6fe-0573f5c0a741,2025-12-15,Walking,33,206,Tough session
+184f488c-c178-42b5-8eb1-86c4f70dd5f4,2025-12-16,Running,50,291,Personal best
+6421cb11-14e4-48a8-83e7-28f08752567e,2025-12-17,Strength Training,47,462,
+0bee5f6d-4fa5-4bec-b921-5d5f2d55965c,2025-12-19,Swimming,36,300,Easy recovery
+501c6696-43bd-42ea-ad47-1d02a8bc19ee,2025-12-20,Cycling,67,430,Personal best
+48d3740d-463d-4c41-b664-edf59b240fb9,2025-12-22,Walking,55,287,Easy recovery
+6edfee13-d993-45d5-88ac-50247f312dd8,2025-12-24,Walking,72,710,
+3a9d0cb4-6ae0-4940-84d3-ba99071b1cab,2025-12-26,Walking,49,299,
+e533b13a-b424-4628-8275-ff985b129ace,2026-01-01,Walking,29,211,
+32d886ba-e871-46a0-99c0-d844bab7db32,2026-01-02,Walking,35,254,
+8590b970-9a25-4aac-a573-b3d1f622f6d0,2026-01-05,Swimming,73,387,
+493aaaff-e1d7-4db4-a7a3-f0b93e14a347,2026-01-06,Yoga,48,357,Easy recovery
+acb0fdea-7502-49ab-87ef-5b1514237bea,2026-01-09,Cycling,45,413,
+2b8d4f5b-43f0-4875-968c-6be61eaf04d3,2026-01-10,Yoga,34,302,Tough session
+31456727-1838-4585-b132-7d36dc001b72,2026-01-13,HIIT,54,436,
+bd873db6-ad22-4628-8bc8-a36ac53ede67,2026-01-14,Running,83,768,Tough session
+cc9f5860-1373-4b15-9244-c0f87de1ea71,2026-01-15,Cycling,80,658,Personal best
+8200b3e7-6294-46b5-b612-f31fa5e6795f,2026-01-16,Strength Training,78,495,Easy recovery
+0390e1d7-87c9-4ed0-9efe-a3b9a653ad6f,2026-01-17,Swimming,55,474,
+e834deb5-a052-4321-9160-50a57a01abf0,2026-01-18,Walking,21,165,Personal best
+dd0f3f12-05e9-45f2-872d-36387e0af413,2026-01-19,HIIT,26,149,
+961c4a68-a489-4715-ba2e-a436e561f19f,2026-01-20,HIIT,32,311,Tough session
+3fb88362-659c-4a23-b59b-ffaddd8d546a,2026-01-21,Walking,78,417,Tough session
+17c9430b-1bd2-4aa8-b7b9-eea239dbf3f0,2026-01-22,Walking,56,402,Personal best
+64188683-3e47-47ef-a965-39a743e6bf71,2026-01-24,HIIT,33,306,Easy recovery
+4306ed1c-5a14-4bbb-b89a-611ba9455663,2026-01-25,Walking,71,662,
+39f1f662-8ad7-46d6-8e44-c3db942e75ed,2026-01-26,Strength Training,90,508,Easy recovery
+5a7c1a65-84f4-463b-b5ce-b5c9252f1127,2026-01-28,Swimming,80,497,
+b3dcc950-3b78-4803-abce-d470d245bf50,2026-01-30,Yoga,68,494,Easy recovery
+f763c497-4b21-4790-b440-81e6a44f646c,2026-02-01,HIIT,39,209,
+8b3297a8-116a-4073-bf96-962e3aa6106a,2026-02-02,Yoga,28,172,
+6ed9633f-1399-4cab-a1c5-cc2b365b293b,2026-02-03,Swimming,38,236,Personal best
+afe83a3f-c8b6-4f58-8ac0-e2339ebd2afe,2026-02-06,Walking,26,248,
+f7c92e83-d2e5-4635-852d-3b033b57c8fd,2026-02-07,Strength Training,36,196,Easy recovery
+bc68ef99-087d-4e27-a060-b74eec20b106,2026-02-09,Strength Training,88,494,Easy recovery
+fe81fa52-ac9c-46c6-b2f3-7f553f33de31,2026-02-10,Walking,79,754,Easy recovery
+82d200a7-007e-4670-9f53-4f75d42bdb2d,2026-02-12,HIIT,67,517,
+3664506c-fb8c-4a60-8cfc-cbe3cd4ca468,2026-02-13,Walking,90,543,Tough session
+27a9a73f-35dd-4f71-aadc-6a1fadfba0ea,2026-02-14,Cycling,34,282,Felt great
+7ae587be-3cbc-4e68-ae5a-512afb7b4b6c,2026-02-16,Running,27,269,
+bdcd15a7-0ce5-4829-8024-fec3e1a3d879,2026-02-17,HIIT,61,421,
+4abf90ba-7483-4102-b635-1c431b0f36f1,2026-02-22,HIIT,54,277,Easy recovery
+98947b84-3da8-428a-a0f6-fb09a808ca4c,2026-02-23,Strength Training,59,507,
+be24835b-1390-48c3-93f9-93951605ffa0,2026-02-24,Running,56,469,
+97e0c23a-b9c5-4265-bfae-347a71b9d480,2026-02-25,HIIT,75,440,Personal best
+913daa8c-7c84-4605-a6a6-2d1848b7e986,2026-02-26,Running,61,357,
+910af4c5-ef30-496c-8c89-1c5f98d7a4b0,2026-02-27,Cycling,29,219,Felt great
+7bb7cd6d-bd86-4fb0-8060-cb529f0271b5,2026-03-01,Strength Training,79,573,Felt great
+046c4d04-e662-47ab-892a-9d4b3f0157bb,2026-03-03,Swimming,87,662,Tough session
+3268b14c-8f23-4c36-9f9e-861c4a6cd207,2026-03-04,Strength Training,39,260,
+8950bc30-afac-46f7-afa7-aaf983eb65af,2026-03-05,Strength Training,22,149,Tough session
+c87d713e-55e1-4ff3-80d0-c6beea7be16f,2026-03-10,Yoga,67,413,Felt great
+60f18757-8179-4ccb-acad-ec3b257897ee,2026-03-12,Strength Training,50,325,Felt great
+cc15797e-4c7a-4ada-a2dc-c2d6a06c1ba2,2026-03-13,HIIT,38,245,Felt great
+eb74c596-42a0-4d35-848b-0c5357d9fb96,2026-03-15,Walking,62,351,Easy recovery
+25dfc5f6-d94d-4275-ba05-5c15bfd4ef6b,2026-03-17,Swimming,63,621,Personal best
+8c6f0778-2a11-463c-a27a-b21fe6649ac5,2026-03-18,HIIT,74,431,Personal best
+39762292-f025-49ee-8896-7336f066f7c1,2026-03-20,Strength Training,69,672,Felt great
+ae413d9b-5b5a-41e2-8f91-381c10db3cbd,2026-03-21,Yoga,35,220,Easy recovery
+e7fb677d-a8c9-4017-b5cb-113bdb10dba9,2026-03-22,Running,90,693,Easy recovery
+fbdec4c6-8646-4965-9c0b-b8e2e83cb981,2026-03-23,Yoga,67,491,
+df0cde4f-1c0d-4347-87dc-12e194d07a7b,2026-03-29,Walking,64,632,Tough session
+e3571e17-acad-4f2d-ac7f-29154e0de9a6,2026-03-30,Yoga,73,455,
+1da3c687-22be-46b3-b47e-90618e06ebae,2026-03-31,Running,31,301,
+e122e653-a8ae-4684-bcc5-9db1f7390686,2026-04-01,Strength Training,66,582,Easy recovery
+f058003d-0996-4001-a265-63bc10d07437,2026-04-03,Swimming,84,436,Felt great
+8a1df298-6fea-498a-a60a-c6311e3f3d44,2026-04-04,Cycling,70,696,
+6fb66c3b-f97f-4f24-bad6-1f5ddc5d719e,2026-04-05,HIIT,23,183,Easy recovery
+17656b71-ccb9-4766-8e34-a18cadeb7d7a,2026-04-06,Cycling,72,608,Personal best
+9c27c33e-e2fe-4656-bdf7-2d85b494be98,2026-04-07,Walking,53,426,Tough session
+58bc7641-9003-4e65-8472-d4e7e133c196,2026-04-08,Strength Training,55,354,
+d1f0e16e-c710-419c-b60a-8817c9f743c6,2026-04-09,Yoga,54,307,
+7fb6f67e-d619-4cbc-ac76-e8a2e79331db,2026-04-11,Walking,31,256,Tough session
+c71a28e8-160b-4b23-b6b5-42aa6597b298,2026-04-14,Cycling,81,536,Tough session
+b1a3a70f-6adc-481a-ab11-6fa2a1841578,2026-04-16,HIIT,67,474,
+6d2e06c1-942b-4e12-a878-5d83873e6083,2026-04-18,Yoga,27,210,
+b2b51052-7217-4542-bd69-7b9c4c1c69fd,2026-04-20,Walking,68,467,
+8e440820-c335-4589-b834-665c23bbac5b,2026-04-21,Walking,49,305,Easy recovery
+0b793859-8189-495d-a4c9-96bed0ad5f3a,2026-04-27,Strength Training,30,288,
+221a888d-7304-4463-9de8-7dff6b0bb466,2026-04-30,Running,48,417,Felt great
+b95f72da-0344-4280-b6e8-878f562c126e,2026-05-02,Walking,29,282,
+e9829886-e31d-45ac-95fa-7b005d57d9bc,2026-05-03,Strength Training,27,218,
+86d29700-e724-4219-82cb-98fa4f5e4ccf,2026-05-04,Running,87,499,Tough session
+80f1df9c-c779-4c64-92d3-83865ad8e9b5,2026-05-06,Cycling,80,508,Felt great
+bed9f630-0dc3-4d6f-b115-dbb160356c66,2026-05-07,Walking,69,578,
+f35f0d6e-6ebf-44c1-b2f3-f3b62d60abfc,2026-05-08,Walking,77,573,Easy recovery
+66412e53-a8b1-4888-b4c9-ff7a2c86c6af,2026-05-10,Cycling,31,184,Personal best
+31dd3473-c4a6-4f75-b955-fb70d45d47e2,2026-05-12,Swimming,55,390,Personal best
+1b02c3c2-f158-4199-ae69-de80b35cb4b3,2026-05-13,Running,70,466,
+ce616c37-441b-469f-871f-88cbbfa369e9,2026-05-16,Yoga,81,640,
+2a9842c1-e4d9-4aaa-acb5-5084c1dcbb9b,2026-05-21,Cycling,62,483,Personal best
+dc112308-a8c7-4702-93fa-fd7902d37a08,2026-05-22,HIIT,47,283,
+ad9d3290-bc67-4efa-89cf-39463c4af0f4,2026-05-23,Running,64,432,Personal best
+9af7091d-167f-4d40-aadc-bc8d24a8488e,2026-05-24,HIIT,88,745,
+a9e97e6b-4625-44b8-9c95-fbed937f3c50,2026-05-25,Strength Training,21,155,Tough session
+a4ad0364-8d16-48cc-b3dd-870926051133,2026-05-26,Strength Training,48,369,Tough session
+914b7d71-ac16-484e-8f4e-7999ec5588ca,2026-05-28,Strength Training,74,431,Tough session

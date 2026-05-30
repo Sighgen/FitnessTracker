@@ -19,7 +19,7 @@ from backend.models import Goal, Nutrition, Weight, Workout
 # Paths
 # -----------------------------
 
-DATA_DIR = Path("data")
+DATA_DIR = Path("/app/backend/data")
 
 WORKOUTS_FILE = DATA_DIR / "workouts.csv"
 NUTRITION_FILE = DATA_DIR / "nutrition.csv"
