@@ -1,11 +1,11 @@
 lint:
-	run ruff check .
+	ruff check .
  
 format:
-	run ruff format .
+	ruff format .
  
 fix:
-	run ruff check . --fix
+	ruff check . --fix
  
 typecheck:
 	python -m mypy .
